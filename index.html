@@ -409,9 +409,11 @@ body::after {
   <button class="nav-btn nav-arrow" onclick="shiftDay(1)">▶</button>
 </div>
 <div id="week-nav">
+  <button id="week-shift-prev" onclick="shiftWeek(-1)">◀◀ 前週</button>
   <button id="week-prev" onclick="shiftWeekPair(-1)">◀</button>
   <span id="week-nav-label"></span>
   <button id="week-next" onclick="shiftWeekPair(1)">▶</button>
+  <button id="week-shift-next" onclick="shiftWeek(1)">翌週 ▶▶</button>
 </div>
 
 <div id="page">
@@ -515,25 +517,33 @@ function selectDate(val) {
   if (accessToken) loadCalendarFor(currentDate); else render();
 }
 
+let weekBaseMonday = null;
+
 async function selectWeek() {
+  const today = dateOnly(new Date());
+  const dow = today.getDay();
+  weekBaseMonday = addDays(today, -(dow === 0 ? 6 : dow - 1));
+  await loadWeek();
+}
+
+async function shiftWeek(dir) {
+  weekBaseMonday = addDays(weekBaseMonday, dir * 7);
+  await loadWeek();
+}
+
+async function loadWeek() {
   weekMode = true;
   setNavActive('btn-week');
   showWeekView();
-
   document.getElementById('week-nav-label').textContent = '読み込み中...';
-
-  const today = dateOnly(new Date());
-  const dow = today.getDay();
-  const monday = addDays(today, -(dow === 0 ? 6 : dow - 1));
 
   weekDays = [];
   for (let i = 0; i < 7; i++) {
-    const day = addDays(monday, i);
+    const day = addDays(weekBaseMonday, i);
     const events = accessToken ? await fetchEventsFor(day) : [];
     weekDays.push({ day, events });
   }
 
-  // 全7ページをレールに構築
   const track = document.getElementById('week-track');
   track.innerHTML = '';
   for (let i = 0; i < 7; i++) {
@@ -541,6 +551,7 @@ async function selectWeek() {
   }
 
   weekPairIdx = 0;
+  document.getElementById('week-viewer').scrollTo({ left: 0, behavior: 'instant' });
   updateWeekNav();
 }
 
