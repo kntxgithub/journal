@@ -446,31 +446,28 @@ body::after {
     }
   } catch(_) {}
 
-  /* キャッシュなし or 期限切れ → APIリクエスト */
+  /* キャッシュなし or 期限切れ → Open Library API（キー不要）*/
   const queries = [
-    'ベストセラー 2024','話題の本 日本','人気小説 日本','ビジネス書 おすすめ',
-    'self help bestseller','novel bestseller 2024','philosophy bestseller',
-    'psychology bestseller','Japanese literature','史上最高の本',
+    'subject:bestseller','subject:fiction','subject:self-help',
+    'subject:philosophy','subject:psychology','subject:history',
+    'subject:biography','subject:science','subject:mystery','subject:thriller',
   ];
   const q = queries[Math.floor(Math.random() * queries.length)];
   try {
     const res = await fetch(
-      `https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(q)}&maxResults=20&orderBy=relevance&printType=books`
+      `https://openlibrary.org/search.json?${q}&limit=50&has_fulltext=false&language=eng`
     );
     if (!res.ok) throw new Error(res.status);
     const data = await res.json();
-    const items = (data.items || []).filter(v => v.volumeInfo.imageLinks);
+    /* カバー画像があるものだけ */
+    const items = (data.docs || []).filter(d => d.cover_i);
     if (!items.length) throw new Error('no items');
-    const book = items[Math.floor(Math.random() * items.length)];
-    const info = book.volumeInfo;
-    const links = info.imageLinks;
-    const imgUrl = (links.large || links.medium || links.thumbnail)
-      .replace('http://', 'https://')
-      .replace('zoom=1', 'zoom=3');
+    const book = items[Math.floor(Math.random() * Math.min(items.length, 30))];
+    const imgUrl = `https://covers.openlibrary.org/b/id/${book.cover_i}-L.jpg`;
     const b = {
       imgUrl,
-      title: info.title || '',
-      author: (info.authors||[]).slice(0,1).join(''),
+      title: book.title || '',
+      author: (book.author_name||[]).slice(0,1).join(''),
       ts: Date.now(),
     };
     localStorage.setItem(CACHE_KEY, JSON.stringify(b));
