@@ -4,6 +4,8 @@
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
 <title>Daily Bullet Journal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@700&display=swap" rel="stylesheet">
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -32,7 +34,7 @@ body::after {
   z-index: 0;
   pointer-events: none;
   text-align: left;
-  font-family: 'Segoe Script', 'Brush Script MT', 'Hiragino Mincho ProN', cursive;
+  font-family: 'Shippori Mincho', 'Segoe Script', 'Brush Script MT', serif;
   font-size: clamp(28px, 4vw, 64px);
   font-weight: bold;
   color: rgba(255,255,255,0.55);
@@ -325,10 +327,28 @@ body::after {
     '一行が\n一歩になる',
     '書けば\n前に進める',
     '今日の自分を\n残しておこう',
-    'The best time\nto write is now',
     '人生は\n書いた分だけ面白い',
-    'Small steps,\nbig journey',
     '今日も\n自分らしく',
+    '千里の道も\n一歩から',
+    '継続は\n力なり',
+    '昨日より\n少しだけ前へ',
+    '迷ったら\n書け',
+    '思考は\n文字になって初めて生きる',
+    '今日の積み重ねが\n明日の自分をつくる',
+    '振り返る勇気が\n前進する力になる',
+    '静かな朝に\n自分と向き合う',
+    '言葉にすると\n気持ちが整う',
+    '小さな記録が\n大きな地図になる',
+    '余白に\n本音が宿る',
+    '今日という贈り物を\n丁寧に開けよう',
+    'The secret of\ngetting ahead\nis getting started',
+    'Write it down,\nmake it happen',
+    'One day or\nday one — you decide',
+    'Small steps,\nbig journey',
+    'The best time\nto write is now',
+    'Begin anywhere.',
+    'Clarity comes\nfrom action',
+    'Done is better\nthan perfect',
   ];
   const phrase = phrases[Math.floor(Math.random() * phrases.length)];
   document.getElementById('bg-text').textContent = phrase;
