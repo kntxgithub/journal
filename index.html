@@ -26,21 +26,21 @@ body::after {
 }
 #bg-text {
   position: fixed;
-  inset: 0;
+  top: 50%;
+  left: calc(50% + 105mm + 24px);
+  transform: translateY(-50%);
   z-index: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
   pointer-events: none;
-  padding: 40px;
-  text-align: center;
+  text-align: left;
   font-family: 'Segoe Script', 'Brush Script MT', 'Hiragino Mincho ProN', cursive;
-  font-size: clamp(36px, 6vw, 80px);
+  font-size: clamp(28px, 4vw, 64px);
   font-weight: bold;
-  color: rgba(255,255,255,0.20);
-  line-height: 1.4;
+  color: rgba(255,255,255,0.55);
+  line-height: 1.5;
   letter-spacing: 0.05em;
   user-select: none;
+  white-space: pre-line;
+  text-shadow: 0 2px 12px rgba(0,0,0,0.3);
 }
 #controls, #page {
   position: relative;
