@@ -4,8 +4,6 @@
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
 <title>Daily Bullet Journal</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@700&display=swap" rel="stylesheet">
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -18,92 +16,6 @@ body {
   padding: 20px;
   min-height: 100vh;
 }
-
-/* ===== 左：本棚パネル ===== */
-#book-panel {
-  position: fixed;
-  top: 50%;
-  left: calc(50% - 105mm - 30px - 148px);
-  transform: translateY(-50%);
-  width: 148px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 10px;
-  z-index: 1;
-}
-#book-cover-wrap {
-  width: 148px;
-  height: 210px;
-  position: relative;
-}
-#book-cover-wrap img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  border-radius: 3px;
-  box-shadow: 4px 6px 20px rgba(0,0,0,0.45);
-  display: block;
-}
-/* 本の背表紙ライン */
-#book-cover-wrap::before {
-  content: '';
-  position: absolute;
-  top: 0; bottom: 0;
-  left: 10px;
-  width: 6px;
-  background: linear-gradient(to right, rgba(0,0,0,0.25), rgba(0,0,0,0.05));
-  border-radius: 2px 0 0 2px;
-  z-index: 1;
-}
-#book-meta {
-  width: 100%;
-  text-align: center;
-}
-#book-title {
-  font-size: 10px;
-  color: rgba(255,255,255,0.75);
-  line-height: 1.4;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-  margin-bottom: 3px;
-  font-family: 'Shippori Mincho', serif;
-}
-#book-author {
-  font-size: 9px;
-  color: rgba(255,255,255,0.45);
-  margin-bottom: 8px;
-}
-#book-links {
-  display: flex;
-  gap: 6px;
-  justify-content: center;
-}
-#book-links a {
-  font-size: 9px;
-  color: rgba(255,255,255,0.55);
-  text-decoration: none;
-  border: 1px solid rgba(255,255,255,0.3);
-  border-radius: 3px;
-  padding: 2px 7px;
-  transition: background 0.2s;
-}
-#book-links a:hover {
-  background: rgba(255,255,255,0.15);
-  color: white;
-}
-
-/* ===== 中央：コントロール＋用紙 ===== */
-#center-col {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 10px;
-  z-index: 1;
-  position: relative;
-}
 body::after {
   content: '';
   position: fixed;
@@ -112,39 +24,21 @@ body::after {
   z-index: 0;
   pointer-events: none;
 }
-#bg-text {
-  position: fixed;
-  top: 50%;
-  left: calc(50% + 105mm + 30px);
-  right: 20px;
-  max-width: calc(50vw - 105mm - 50px);
-  transform: translateY(-50%);
-  z-index: 0;
-  pointer-events: none;
-  text-align: left;
-  word-break: break-word;
-  font-family: 'Shippori Mincho', 'Segoe Script', 'Brush Script MT', serif;
-  font-size: clamp(28px, 4vw, 64px);
-  font-weight: bold;
-  color: rgba(255,255,255,0.55);
-  line-height: 1.5;
-  letter-spacing: 0.05em;
-  user-select: none;
-  white-space: pre-line;
-  text-shadow: 0 2px 12px rgba(0,0,0,0.3);
-}
-#controls, #page {
-  position: relative;
-  z-index: 1;
-}
 
-/* ===== コントロールバー ===== */
+/* ===== コントロール類 ===== */
+#center-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  z-index: 1;
+  position: relative;
+}
 #controls {
   width: 210mm;
   max-width: 100%;
   display: flex;
   gap: 8px;
-  margin-bottom: 10px;
   align-items: center;
   flex-wrap: wrap;
 }
@@ -160,7 +54,58 @@ body::after {
 #controls button:hover { background: #3d5f80; }
 #signin-btn { background: #c0392b !important; }
 #signin-btn:hover { background: #922b21 !important; }
-#user-info { font-size: 11px; color: #666; margin-left: auto; }
+#user-info { font-size: 11px; color: rgba(255,255,255,0.8); margin-left: auto; }
+
+/* ===== 日付ナビ ===== */
+#date-nav {
+  width: 210mm;
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.nav-btn {
+  padding: 4px 12px;
+  border: 1px solid rgba(255,255,255,0.4);
+  border-radius: 4px;
+  background: rgba(255,255,255,0.15);
+  color: white;
+  font-size: 12px;
+  cursor: pointer;
+  backdrop-filter: blur(4px);
+  transition: background 0.2s;
+}
+.nav-btn:hover { background: rgba(255,255,255,0.3); }
+.nav-btn.active { background: rgba(255,255,255,0.45); color: #222; font-weight: bold; }
+.nav-arrow { padding: 4px 8px; }
+
+/* ===== 週ナビ（今週モード時に表示）===== */
+#week-nav {
+  display: none;
+  gap: 10px;
+  align-items: center;
+}
+#week-nav.visible { display: flex; }
+#week-nav button {
+  padding: 5px 16px;
+  border: 1px solid rgba(255,255,255,0.5);
+  border-radius: 4px;
+  background: rgba(255,255,255,0.2);
+  color: white;
+  font-size: 14px;
+  cursor: pointer;
+  backdrop-filter: blur(4px);
+  transition: background 0.2s;
+}
+#week-nav button:hover { background: rgba(255,255,255,0.35); }
+#week-nav button:disabled { opacity: 0.3; cursor: default; }
+#week-nav-label {
+  color: rgba(255,255,255,0.9);
+  font-size: 13px;
+  min-width: 120px;
+  text-align: center;
+  font-weight: bold;
+}
 
 /* ===== A4用紙 ===== */
 #page {
@@ -175,7 +120,7 @@ body::after {
   overflow: hidden;
 }
 
-/* ===== 縦線 2本：body-rows に限定 ===== */
+/* ===== 縦線 2本 ===== */
 #body-rows {
   position: relative;
 }
@@ -210,7 +155,6 @@ body::after {
   border-bottom: 1px solid #2c2c2c;
   margin-bottom: 3px;
 }
-
 #date-display {
   font-family: 'Segoe Script', 'Brush Script MT', cursive;
   font-size: 20px;
@@ -219,7 +163,6 @@ body::after {
   min-width: 110px;
   letter-spacing: 0.5px;
 }
-
 .hfields {
   display: flex;
   flex: 1;
@@ -287,7 +230,6 @@ body::after {
   flex-direction: column;
   border-bottom: 2px solid #7a9fc0;
 }
-
 .row {
   display: flex;
   align-items: flex-end;
@@ -297,7 +239,6 @@ body::after {
   position: relative;
 }
 .row.has-event { border-bottom-color: #a0b0c4; }
-
 .col-bullet {
   width: 8mm;
   display: flex;
@@ -309,7 +250,6 @@ body::after {
   line-height: 1;
   flex-shrink: 0;
 }
-
 .col-time {
   width: 26mm;
   padding: 0 3px 1px;
@@ -327,7 +267,6 @@ body::after {
   text-align: center;
   font-family: 'Segoe UI', sans-serif;
 }
-
 .col-detail {
   flex: 1;
   display: flex;
@@ -352,37 +291,18 @@ body::after {
   min-width: 0;
   font-family: 'Segoe UI', 'Meiryo', sans-serif;
 }
-
 .row.empty-row .col-time input { color: #ddd; }
 .row.empty-row .col-detail input { color: #ddd; }
 
-/* ===== 日付ナビ ===== */
-#date-nav {
-  width: 210mm;
-  display: flex;
-  gap: 6px;
-  align-items: center;
-  flex-wrap: wrap;
+/* ===== 週ビュー（2ページ横並び）===== */
+#week-viewer {
+  display: none;
+  gap: 16px;
+  align-items: flex-start;
 }
-.nav-btn {
-  padding: 4px 12px;
-  border: 1px solid rgba(255,255,255,0.4);
-  border-radius: 4px;
-  background: rgba(255,255,255,0.15);
-  color: white;
-  font-size: 12px;
-  cursor: pointer;
-  backdrop-filter: blur(4px);
-  transition: background 0.2s;
-}
-.nav-btn:hover { background: rgba(255,255,255,0.3); }
-.nav-btn.active { background: rgba(255,255,255,0.45); color: #222; font-weight: bold; }
-#date-nav button:first-child,
-#date-nav button:last-child { padding: 4px 8px; }
+#week-viewer.visible { display: flex; }
 
-/* ===== 週表示：複数ページ ===== */
-#week-pages { display: none; }
-#week-pages .week-page {
+.week-page {
   width: 210mm;
   height: 297mm;
   background: #fffff8;
@@ -392,16 +312,35 @@ body::after {
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  margin-bottom: 20px;
+  flex-shrink: 0;
+  zoom: 0.68;
 }
-#week-pages .week-page .wp-body {
+.wp-hdr {
+  display: flex;
+  align-items: baseline;
+  padding-bottom: 3px;
+  border-bottom: 2.5px solid #2c2c2c;
+  margin-bottom: 1px;
+}
+.wp-hdr2 {
+  border-bottom: 1px solid #2c2c2c;
+  margin-bottom: 3px;
+}
+.wp-title {
+  display: flex;
+  align-items: center;
+  border-bottom: 2px solid #7a9fc0;
+  min-height: 9mm;
+  padding: 2px 0;
+}
+.wp-body {
   position: relative;
   flex: 1;
   display: flex;
   flex-direction: column;
   border-bottom: 2px solid #7a9fc0;
 }
-#week-pages .week-page .wp-body::before {
+.wp-body::before {
   content: '';
   position: absolute;
   top: 0; bottom: 0;
@@ -410,7 +349,7 @@ body::after {
   border-left: 1.2px solid rgba(176,48,48,0.55);
   pointer-events: none;
 }
-#week-pages .week-page .wp-body::after {
+.wp-body::after {
   content: '';
   position: absolute;
   top: 0; bottom: 0;
@@ -424,9 +363,10 @@ body::after {
 @media print {
   @page { size: A4; margin: 0; }
   body { background: white; padding: 0; }
-  #controls, #date-nav, #bg-text, #book-panel { display: none !important; }
+  #controls, #date-nav, #week-nav { display: none !important; }
   #page { box-shadow: none; }
-  #week-pages .week-page { box-shadow: none; page-break-after: always; }
+  .week-page { zoom: 1; box-shadow: none; page-break-after: always; }
+  #week-viewer { display: block !important; }
   .col-time input { color: #aaa !important; }
   .col-calname { color: #bbb !important; }
   .row.empty-row .col-time input,
@@ -437,22 +377,6 @@ body::after {
 </head>
 <body>
 
-<div id="bg-text"></div>
-
-<div id="book-panel">
-  <div id="book-cover-wrap">
-    <img id="book-img" src="" alt=""/>
-  </div>
-  <div id="book-meta">
-    <div id="book-title"></div>
-    <div id="book-author"></div>
-    <div id="book-links">
-      <a id="book-amazon" href="#" target="_blank" rel="noopener">Amazon</a>
-      <a id="book-search" href="#" target="_blank" rel="noopener">検索</a>
-    </div>
-  </div>
-</div>
-
 <div id="center-col">
 <div id="controls">
   <button id="signin-btn" onclick="handleSignIn()">Googleでサインイン</button>
@@ -460,18 +384,22 @@ body::after {
   <span id="user-info"></span>
 </div>
 <div id="date-nav">
-  <button class="nav-btn" onclick="shiftDay(-1)">◀</button>
-  <button class="nav-btn active" onclick="selectDay(0)">今日</button>
-  <button class="nav-btn" onclick="selectDay(1)">明日</button>
-  <button class="nav-btn" onclick="selectDay(2)">明後日</button>
-  <button class="nav-btn" onclick="selectWeek()">今週</button>
+  <button class="nav-btn nav-arrow" onclick="shiftDay(-1)">◀</button>
+  <button class="nav-btn active" id="btn-today" onclick="selectDay(0)">今日</button>
+  <button class="nav-btn" id="btn-tomorrow" onclick="selectDay(1)">明日</button>
+  <button class="nav-btn" id="btn-dayafter" onclick="selectDay(2)">明後日</button>
+  <button class="nav-btn" id="btn-week" onclick="selectWeek()">今週</button>
   <button class="nav-btn" onclick="document.getElementById('date-picker').showPicker?.() || document.getElementById('date-picker').click()">📅 日付指定</button>
   <input type="date" id="date-picker" onchange="selectDate(this.value)" style="display:none"/>
-  <button class="nav-btn" onclick="shiftDay(1)">▶</button>
+  <button class="nav-btn nav-arrow" onclick="shiftDay(1)">▶</button>
+</div>
+<div id="week-nav">
+  <button id="week-prev" onclick="shiftWeekPair(-1)">◀</button>
+  <span id="week-nav-label"></span>
+  <button id="week-next" onclick="shiftWeekPair(1)">▶</button>
 </div>
 
 <div id="page">
-
   <div id="header">
     <div id="date-display"></div>
     <div class="hfields">
@@ -484,231 +412,73 @@ body::after {
     </div>
   </div>
   <div id="header-line2"></div>
-
   <div id="title-row">
     <span class="title-label">Title:</span>
     <input type="text"/>
   </div>
-
   <div id="body-rows"></div>
-
 </div><!-- /page -->
 
-<div id="week-pages"></div>
+<div id="week-viewer"></div>
 
 </div><!-- /center-col -->
 
 <script>
+/* ===== 背景（Pexels）===== */
 (async function() {
-  const CACHE_KEY = 'journal_book_v5';
-  const CACHE_TTL = 24 * 60 * 60 * 1000;
-
-  /* 2022〜2024年 本屋大賞・直木賞・ベストセラー */
-  const fallback = [
-    { title: '成瀬は天下を取りにいく',      author: '宮島未奈'   },
-    { title: '汝、星のごとく',            author: '凪良ゆう'   },
-    { title: '同志少女よ、敵を撃て',        author: '逢坂冬馬'   },
-    { title: '黒牢城',                   author: '米澤穂信'   },
-    { title: '推し、燃ゆ',               author: '宇佐見りん' },
-    { title: 'ラブカは静かに弓を持つ',      author: '安壇美緒'   },
-    { title: '水車小屋のネネ',            author: '津村記久子' },
-    { title: '君が手にするはずだった黄金について', author: '小川哲' },
-    { title: '存在のすべてを',            author: '塩田武士'   },
-    { title: '光のとこにいてね',           author: '一穂ミチ'   },
-    { title: 'ゴールデンスランバー',        author: '伊坂幸太郎' },
-    { title: 'DIE WITH ZERO',           author: 'ビル・パーキンス' },
-    { title: 'THE TEAM 5つの法則',      author: '麻野耕司'   },
-    { title: '言語化の魔力',             author: '樺沢紫苑'   },
-    { title: 'ライフシフト２',            author: 'リンダ・グラットン' },
-  ];
-
-  function showBook(b) {
-    const panel = document.getElementById('book-panel');
-    panel.style.display = '';
-    const imgEl = document.getElementById('book-img');
-    imgEl.src = b.imgUrl;
-    imgEl.onerror = () => { panel.style.display = 'none'; };
-    document.getElementById('book-title').textContent = b.title;
-    document.getElementById('book-author').textContent = b.author;
-    setLinks(b.title, b.author);
-  }
-
-  function setLinks(title, author) {
-    document.getElementById('book-amazon').href =
-      `https://www.amazon.co.jp/s?k=${encodeURIComponent(title + ' ' + author)}`;
-    document.getElementById('book-search').href =
-      `https://www.google.com/search?q=${encodeURIComponent(title + ' ' + author)}`;
-  }
-
-  /* キャッシュ確認 */
+  const KEY = 'JK8iPRF0Qq6bMAIicPJ5mpHPokHDWNclw4hvrMzgvTOxbwpLjkxEnW8S';
+  const qs = ['nature landscape','mountain sunrise','ocean beach morning','forest light','lake reflection','cherry blossom japan','green field sky'];
+  const q = qs[Math.floor(Math.random() * qs.length)];
   try {
-    const cached = JSON.parse(localStorage.getItem(CACHE_KEY) || 'null');
-    if (cached && Date.now() - cached.ts < CACHE_TTL) { showBook(cached); return; }
-  } catch(_) {}
-
-  /* Google Books API で日本語書籍を検索 */
-  const queries = [
-    '成瀬は天下を取りにいく','汝、星のごとく','同志少女よ、敵を撃て',
-    '黒牢城 米澤穂信','推し、燃ゆ','水車小屋のネネ',
-    '存在のすべてを 塩田武士','光のとこにいてね','言語化の魔力',
-    'ライフシフト２ 日本語',
-  ];
-  const q = queries[Math.floor(Math.random() * queries.length)];
-  try {
-    const res = await fetch(
-      `https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(q)}&maxResults=5&langRestrict=ja&printType=books`
-    );
-    if (!res.ok) throw new Error(res.status);
-    const data = await res.json();
-    const items = (data.items || []).filter(v => v.volumeInfo.imageLinks);
-    if (!items.length) throw new Error('no items');
-    const item = items[0];
-    const info = item.volumeInfo;
-    const links = info.imageLinks;
-    const imgUrl = (links.medium || links.thumbnail)
-      .replace('http://', 'https://')
-      .replace('zoom=1', 'zoom=2');
-    const b = {
-      imgUrl, title: info.title || '',
-      author: (info.authors||[]).slice(0,1).join(''),
-      ts: Date.now(),
-    };
-    localStorage.setItem(CACHE_KEY, JSON.stringify(b));
-    showBook(b);
-  } catch(e) {
-    document.getElementById('book-panel').style.display = 'none';
-  }
-})();
-
-(function() {
-  const phrases = [
-    /* Gandhi */
-    '明日死ぬかのように生きろ\n永遠に生きるかのように学べ',
-    /* Steve Jobs */
-    '今日が人生最後の日だとしたら\n今日することは本当にやりたいことか',
-    /* Churchill */
-    '成功とは\n情熱を失わずに\n失敗を重ねることだ',
-    /* Mark Twain */
-    '二十年後\nやったことよりも\nやらなかったことを後悔する',
-    /* Nietzsche */
-    '生きる理由を持つ者は\nいかなる状況にも耐えられる',
-    /* Einstein */
-    '昨日と同じことを繰り返しながら\n異なる結果を望むのは狂気だ',
-    /* Einstein */
-    '想像力は\n知識よりも重要だ',
-    /* Helen Keller */
-    '人生は大胆な冒険か\n無かのどちらかだ',
-    /* Marcus Aurelius */
-    '心を支配する者が\n人生を支配する',
-    /* Marcus Aurelius */
-    '今この瞬間に集中せよ\n過去は死に\n未来はまだ生まれていない',
-    /* Seneca */
-    '人生は短いのではない\n我々が長く使わないだけだ',
-    /* Seneca */
-    'どこにでもいる者は\nどこにもいない',
-    /* Rumi */
-    '傷口は\n光の差し込む場所だ',
-    /* Dostoevsky */
-    '人は苦しみによってのみ\n鍛えられる',
-    /* Hemingway */
-    '世界はすべての人を壊す\nしかし壊れた場所が\n強くなる者もいる',
-    /* Napoleon */
-    '不可能とは\n小さな人間の辞書にある言葉だ',
-    /* 宮本武蔵 */
-    '千日の稽古を鍛とし\n万日の稽古を錬とす',
-    /* 坂本龍馬 */
-    '世の人は我を何とも言わば言え\n我が成すことは我のみぞ知る',
-    /* 孔子 */
-    '学びて思わざれば則ち罔し\n思いて学ばざれば則ち殆し',
-    /* 吉田松陰 */
-    '夢なき者に理想なく\n理想なき者に計画なく\n計画なき者に実行なし',
-    /* 西郷隆盛 */
-    '人を相手にせず\n天を相手にせよ',
-    /* 松下幸之助 */
-    '失敗の原因を素直に認め\nそれを糧として前進する',
-    /* 本田宗一郎 */
-    '成功とは\n99%の失敗に支えられた\n1%だ',
-    /* Aristotle */
-    '優秀さは\n行為ではなく習慣だ',
-    /* Darwin */
-    '生き残るのは\n最も強い者でも賢い者でもなく\n変化に適応した者だ',
-    /* Picasso */
-    '行動こそが\nすべての成功の基本となる',
-    /* Leonardo da Vinci */
-    '学ぶことをやめた者は\n老いている\n学び続ける者は\nいつまでも若い',
-    /* Voltaire */
-    '完璧は\n善の敵だ',
-    /* Thoreau */
-    '自信を持って\n夢の方向へ歩め\n思い描いた人生を\n生きよ',
-    /* Ralph Waldo Emerson */
-    '人生とは\nあなたが考えたとおりのものだ',
-    /* Lao Tzu */
-    '千里の道も\n一歩から始まる',
-    /* Lao Tzu */
-    '知人を知る者は賢く\n自分を知る者は悟る',
-    'One day or\nday one —\nyou decide',
-    'The obstacle is\nthe way',
-    'Do what you can,\nwith what you have,\nwhere you are',
-    'Fail fast,\nlearn faster',
-    'Be the change\nyou wish to\nsee in the world',
-    'It always seems\nimpossible\nuntil it\'s done',
-  ];
-  const phrase = phrases[Math.floor(Math.random() * phrases.length)];
-  document.getElementById('bg-text').textContent = phrase;
-})();
-
-(async function() {
-  const PEXELS_KEY = 'JK8iPRF0Qq6bMAIicPJ5mpHPokHDWNclw4hvrMzgvTOxbwpLjkxEnW8S';
-  const queries = ['nature landscape','mountain sunrise','ocean beach morning','forest light','lake reflection','cherry blossom japan','green field sky'];
-  const q = queries[Math.floor(Math.random() * queries.length)];
-  try {
-    const res = await fetch(
-      `https://api.pexels.com/v1/search?query=${encodeURIComponent(q)}&per_page=20&orientation=landscape`,
-      { headers: { Authorization: PEXELS_KEY } }
-    );
+    const res = await fetch(`https://api.pexels.com/v1/search?query=${encodeURIComponent(q)}&per_page=20&orientation=landscape`,
+      { headers: { Authorization: KEY } });
     const data = await res.json();
     const photos = data.photos || [];
     if (photos.length) {
       const photo = photos[Math.floor(Math.random() * photos.length)];
       document.body.style.backgroundImage = `url('${photo.src.large2x}')`;
     }
-  } catch(e) { console.warn('背景取得失敗:', e); }
+  } catch(e) {}
 })();
 
 /* ===== 日付管理 ===== */
-const DAYS_JA = ['日','月','火','水','木','金','土'];
 const DAYS_EN = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+const DAYS_JP = ['日','月','火','水','木','金','土'];
 let currentDate = new Date();
 let weekMode = false;
+let weekDays = [];   // {day, events}[7]
+let weekPairIdx = 0; // 表示中の先頭インデックス（0,2,4,6）
 
-function dateOnly(d) {
-  return new Date(d.getFullYear(), d.getMonth(), d.getDate());
-}
-function addDays(d, n) {
-  const r = new Date(d); r.setDate(r.getDate() + n); return r;
-}
-function fmtHeader(d) {
-  return `${d.getMonth()+1}/${d.getDate()}  (${DAYS_EN[d.getDay()]})`;
+function dateOnly(d) { return new Date(d.getFullYear(), d.getMonth(), d.getDate()); }
+function addDays(d, n) { const r = new Date(d); r.setDate(r.getDate() + n); return r; }
+function fmtHeader(d) { return `${d.getMonth()+1}/${d.getDate()}  (${DAYS_EN[d.getDay()]})`; }
+
+function setNavActive(id) {
+  ['btn-today','btn-tomorrow','btn-dayafter','btn-week'].forEach(b => {
+    document.getElementById(b).classList.remove('active');
+  });
+  if (id) document.getElementById(id).classList.add('active');
 }
 
-function setNavActive(btn) {
-  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-  if (btn) btn.classList.add('active');
+function showSinglePage() {
+  document.getElementById('page').style.display = '';
+  document.getElementById('week-viewer').classList.remove('visible');
+  document.getElementById('week-nav').classList.remove('visible');
+}
+function showWeekView() {
+  document.getElementById('page').style.display = 'none';
+  document.getElementById('week-viewer').classList.add('visible');
+  document.getElementById('week-nav').classList.add('visible');
 }
 
 function selectDay(offset) {
   weekMode = false;
   currentDate = addDays(dateOnly(new Date()), offset);
-  document.getElementById('page').style.display = '';
-  document.getElementById('week-pages').style.display = 'none';
+  showSinglePage();
   document.getElementById('date-display').textContent = fmtHeader(currentDate);
-  const btns = document.querySelectorAll('.nav-btn');
-  if (offset === 0) setNavActive(btns[1]);
-  else if (offset === 1) setNavActive(btns[2]);
-  else if (offset === 2) setNavActive(btns[3]);
-  else setNavActive(null);
-  if (accessToken) loadCalendarFor(currentDate);
-  else render();
+  const ids = ['btn-today','btn-tomorrow','btn-dayafter'];
+  setNavActive(ids[offset] || null);
+  if (accessToken) loadCalendarFor(currentDate); else render();
 }
 
 function shiftDay(n) {
@@ -716,8 +486,7 @@ function shiftDay(n) {
   currentDate = addDays(currentDate, n);
   document.getElementById('date-display').textContent = fmtHeader(currentDate);
   setNavActive(null);
-  if (accessToken) loadCalendarFor(currentDate);
-  else render();
+  if (accessToken) loadCalendarFor(currentDate); else render();
 }
 
 function selectDate(val) {
@@ -725,38 +494,58 @@ function selectDate(val) {
   weekMode = false;
   const [y,m,d] = val.split('-').map(Number);
   currentDate = new Date(y, m-1, d);
-  document.getElementById('page').style.display = '';
-  document.getElementById('week-pages').style.display = 'none';
+  showSinglePage();
   document.getElementById('date-display').textContent = fmtHeader(currentDate);
   setNavActive(null);
-  if (accessToken) loadCalendarFor(currentDate);
-  else render();
+  if (accessToken) loadCalendarFor(currentDate); else render();
 }
 
 async function selectWeek() {
   weekMode = true;
-  setNavActive(document.querySelectorAll('.nav-btn')[4]);
-  document.getElementById('page').style.display = 'none';
-  const wp = document.getElementById('week-pages');
-  wp.style.display = '';
-  wp.innerHTML = '<p style="color:white;padding:10px">読み込み中...</p>';
+  setNavActive('btn-week');
+  showWeekView();
+  document.getElementById('week-viewer').innerHTML =
+    '<p style="color:white;padding:10px;font-size:14px">読み込み中...</p>';
 
   const today = dateOnly(new Date());
   const dow = today.getDay();
-  const monday = addDays(today, -dow + (dow === 0 ? -6 : 1));
+  const monday = addDays(today, -(dow === 0 ? 6 : dow - 1));
 
-  const pages = [];
+  weekDays = [];
   for (let i = 0; i < 7; i++) {
     const day = addDays(monday, i);
-    let events = [];
-    if (accessToken) events = await fetchEventsFor(day);
-    pages.push({ day, events });
+    const events = accessToken ? await fetchEventsFor(day) : [];
+    weekDays.push({ day, events });
   }
 
-  wp.innerHTML = '';
-  for (const { day, events } of pages) {
-    wp.appendChild(buildWeekPage(day, events));
-  }
+  weekPairIdx = 0;
+  renderWeekPair();
+}
+
+function shiftWeekPair(dir) {
+  const next = weekPairIdx + dir * 2;
+  if (next < 0 || next >= 7) return;
+  weekPairIdx = next;
+  renderWeekPair();
+}
+
+function renderWeekPair() {
+  const viewer = document.getElementById('week-viewer');
+  viewer.innerHTML = '';
+
+  const a = weekDays[weekPairIdx];
+  const b = weekDays[weekPairIdx + 1];
+  if (a) viewer.appendChild(buildWeekPage(a.day, a.events));
+  if (b) viewer.appendChild(buildWeekPage(b.day, b.events));
+
+  // ラベル
+  const dayA = weekDays[weekPairIdx].day;
+  const dayB = weekDays[Math.min(weekPairIdx + 1, 6)].day;
+  const label = `${dayA.getMonth()+1}/${dayA.getDate()}(${DAYS_JP[dayA.getDay()]}) — ${dayB.getMonth()+1}/${dayB.getDate()}(${DAYS_JP[dayB.getDay()]})`;
+  document.getElementById('week-nav-label').textContent = label;
+
+  document.getElementById('week-prev').disabled = (weekPairIdx === 0);
+  document.getElementById('week-next').disabled = (weekPairIdx + 2 >= 7);
 }
 
 function buildWeekPage(day, events) {
@@ -765,16 +554,16 @@ function buildWeekPage(day, events) {
 
   // ヘッダー
   const hdr = document.createElement('div');
-  hdr.style.cssText = 'display:flex;align-items:baseline;padding-bottom:3px;border-bottom:2.5px solid #2c2c2c;margin-bottom:1px;';
+  hdr.className = 'wp-hdr';
   hdr.innerHTML = `<div style="font-family:'Segoe Script',cursive;font-size:20px;min-width:110px">${fmtHeader(day)}</div>`;
   pg.appendChild(hdr);
-  const line2 = document.createElement('div');
-  line2.style.cssText = 'border-bottom:1px solid #2c2c2c;margin-bottom:3px;';
-  pg.appendChild(line2);
+  const hdr2 = document.createElement('div');
+  hdr2.className = 'wp-hdr2';
+  pg.appendChild(hdr2);
 
   // タイトル行
   const tr = document.createElement('div');
-  tr.style.cssText = 'display:flex;align-items:center;border-bottom:2px solid #7a9fc0;min-height:9mm;padding:2px 0;';
+  tr.className = 'wp-title';
   tr.innerHTML = `<span style="font-family:'Segoe Script',cursive;font-size:20px;color:#888;margin-right:6px">Title:</span><input type="text" style="flex:1;border:none;background:transparent;font-size:14px;font-family:'Segoe Script',cursive;color:#1a3a5c;outline:none"/>`;
   pg.appendChild(tr);
 
@@ -783,9 +572,7 @@ function buildWeekPage(day, events) {
   body.className = 'wp-body';
   for (let i = 0; i < 25; i++) {
     const ev = events[i];
-    body.appendChild(ev
-      ? makeRow(ev.timeStr, ev.calname, ev.detail)
-      : makeRow());
+    body.appendChild(ev ? makeRow(ev.timeStr, ev.calname, ev.detail) : makeRow());
   }
   pg.appendChild(body);
   return pg;
@@ -794,6 +581,7 @@ function buildWeekPage(day, events) {
 /* 初期表示 */
 document.getElementById('date-display').textContent = fmtHeader(currentDate);
 
+/* ===== 行生成 ===== */
 let calColorMap = {};
 
 function makeRow(time, calname, detail) {
@@ -846,6 +634,7 @@ function render(events = []) {
 }
 render();
 
+/* ===== Google OAuth ===== */
 const CLIENT_ID = '616683928852-chp1t7qqigfeeuolpcjbc8e14uueka8i.apps.googleusercontent.com';
 const SCOPES = 'https://www.googleapis.com/auth/calendar.readonly';
 let tokenClient, accessToken;
