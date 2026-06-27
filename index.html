@@ -520,8 +520,7 @@ async function selectWeek() {
   setNavActive('btn-week');
   showWeekView();
 
-  const viewer = document.getElementById('week-viewer');
-  viewer.innerHTML = '<p style="color:white;padding:10px;font-size:14px">読み込み中...</p>';
+  document.getElementById('week-nav-label').textContent = '読み込み中...';
 
   const today = dateOnly(new Date());
   const dow = today.getDay();
