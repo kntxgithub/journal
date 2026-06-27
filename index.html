@@ -472,32 +472,14 @@ body::after {
     if (cached && Date.now() - cached.ts < CACHE_TTL) { showBook(cached); return; }
   } catch(_) {}
 
-  /* Open Library トレンドAPIを試す */
-  try {
-    const res = await fetch('https://openlibrary.org/trending/daily.json?limit=20');
-    if (!res.ok) throw new Error(res.status);
-    const data = await res.json();
-    const works = (data.works || []).filter(w => w.cover_i);
-    if (!works.length) throw new Error('no covers');
-    const w = works[Math.floor(Math.random() * works.length)];
-    const b = {
-      imgUrl: `https://covers.openlibrary.org/b/id/${w.cover_i}-L.jpg`,
-      title:  w.title || '',
-      author: (w.author_name||[]).slice(0,1).join(''),
-      ts: Date.now(),
-    };
-    localStorage.setItem(CACHE_KEY, JSON.stringify(b));
-    showBook(b);
-  } catch(e) {
-    /* APIが失敗したらフォールバックリストをそのまま使う */
-    const fb = fallback[Math.floor(Math.random() * fallback.length)];
-    const b = {
-      imgUrl: `https://covers.openlibrary.org/b/id/${fb.cover_i}-L.jpg`,
-      title: fb.title, author: fb.author, ts: Date.now(),
-    };
-    localStorage.setItem(CACHE_KEY, JSON.stringify(b));
-    showBook(b);
-  }
+  /* APIなし — ハードコードリストからランダムに選ぶだけ */
+  const fb = fallback[Math.floor(Math.random() * fallback.length)];
+  const b = {
+    imgUrl: `https://covers.openlibrary.org/b/id/${fb.cover_i}-L.jpg`,
+    title: fb.title, author: fb.author, ts: Date.now(),
+  };
+  localStorage.setItem(CACHE_KEY, JSON.stringify(b));
+  showBook(b);
 })();
 
 (function() {
