@@ -379,7 +379,8 @@ body::after {
   body { background: white; padding: 0; }
   #controls, #date-nav, #week-nav { display: none !important; }
   #page { box-shadow: none; }
-  #week-viewer { display: block !important; overflow: visible; width: auto; }
+  #week-viewer { display: none !important; }
+  #week-viewer.visible { display: block !important; overflow: visible; width: auto; }
   #week-track { display: block; }
   .week-page { box-shadow: none; page-break-after: always; width: 210mm; height: 297mm; }
   .col-time input { color: #aaa !important; }
