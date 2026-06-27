@@ -294,10 +294,10 @@ body::after {
 .row.empty-row .col-time input { color: #ddd; }
 .row.empty-row .col-detail input { color: #ddd; }
 
-/* ===== 週ビュー（2ページ横並び）===== */
+/* ===== 週ビュー（2ページ横並び・フルサイズ）===== */
 #week-viewer {
   display: none;
-  gap: 16px;
+  gap: 20px;
   align-items: flex-start;
 }
 #week-viewer.visible { display: flex; }
@@ -309,12 +309,12 @@ body::after {
   box-shadow: 0 4px 24px rgba(0,0,0,0.28);
   padding: 10mm 10mm 8mm 20mm;
   position: relative;
-  display: flex;
+  display: none;          /* JS で wp-visible を付けた2枚だけ表示 */
   flex-direction: column;
   overflow: hidden;
   flex-shrink: 0;
-  zoom: 0.68;
 }
+.week-page.wp-visible { display: flex; }
 .wp-hdr {
   display: flex;
   align-items: baseline;
@@ -365,8 +365,8 @@ body::after {
   body { background: white; padding: 0; }
   #controls, #date-nav, #week-nav { display: none !important; }
   #page { box-shadow: none; }
-  .week-page { zoom: 1; box-shadow: none; page-break-after: always; }
-  #week-viewer { display: block !important; }
+  .week-page { display: flex !important; box-shadow: none; page-break-after: always; }
+  #week-viewer { display: flex !important; flex-direction: column; gap: 0; }
   .col-time input { color: #aaa !important; }
   .col-calname { color: #bbb !important; }
   .row.empty-row .col-time input,
@@ -504,8 +504,9 @@ async function selectWeek() {
   weekMode = true;
   setNavActive('btn-week');
   showWeekView();
-  document.getElementById('week-viewer').innerHTML =
-    '<p style="color:white;padding:10px;font-size:14px">読み込み中...</p>';
+
+  const viewer = document.getElementById('week-viewer');
+  viewer.innerHTML = '<p style="color:white;padding:10px;font-size:14px">読み込み中...</p>';
 
   const today = dateOnly(new Date());
   const dow = today.getDay();
@@ -518,34 +519,37 @@ async function selectWeek() {
     weekDays.push({ day, events });
   }
 
+  // 全7ページをDOMに構築（印刷用）
+  viewer.innerHTML = '';
+  for (let i = 0; i < 7; i++) {
+    const pg = buildWeekPage(weekDays[i].day, weekDays[i].events);
+    pg.dataset.idx = i;
+    viewer.appendChild(pg);
+  }
+
   weekPairIdx = 0;
-  renderWeekPair();
+  updateWeekVisible();
 }
 
 function shiftWeekPair(dir) {
-  const next = weekPairIdx + dir * 2;
-  if (next < 0 || next >= 7) return;
+  const next = weekPairIdx + dir;
+  if (next < 0 || next > 5) return;
   weekPairIdx = next;
-  renderWeekPair();
+  updateWeekVisible();
 }
 
-function renderWeekPair() {
-  const viewer = document.getElementById('week-viewer');
-  viewer.innerHTML = '';
+function updateWeekVisible() {
+  document.querySelectorAll('.week-page').forEach((pg, i) => {
+    pg.classList.toggle('wp-visible', i === weekPairIdx || i === weekPairIdx + 1);
+  });
 
-  const a = weekDays[weekPairIdx];
-  const b = weekDays[weekPairIdx + 1];
-  if (a) viewer.appendChild(buildWeekPage(a.day, a.events));
-  if (b) viewer.appendChild(buildWeekPage(b.day, b.events));
-
-  // ラベル
   const dayA = weekDays[weekPairIdx].day;
   const dayB = weekDays[Math.min(weekPairIdx + 1, 6)].day;
-  const label = `${dayA.getMonth()+1}/${dayA.getDate()}(${DAYS_JP[dayA.getDay()]}) — ${dayB.getMonth()+1}/${dayB.getDate()}(${DAYS_JP[dayB.getDay()]})`;
-  document.getElementById('week-nav-label').textContent = label;
+  const fmt2 = d => `${d.getMonth()+1}/${d.getDate()}(${DAYS_JP[d.getDay()]})`;
+  document.getElementById('week-nav-label').textContent = `${fmt2(dayA)} — ${fmt2(dayB)}`;
 
   document.getElementById('week-prev').disabled = (weekPairIdx === 0);
-  document.getElementById('week-next').disabled = (weekPairIdx + 2 >= 7);
+  document.getElementById('week-next').disabled = (weekPairIdx >= 5);
 }
 
 function buildWeekPage(day, events) {
