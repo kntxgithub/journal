@@ -24,6 +24,24 @@ body::after {
   z-index: 0;
   pointer-events: none;
 }
+#bg-text {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  padding: 40px;
+  text-align: center;
+  font-family: 'Segoe Script', 'Brush Script MT', 'Hiragino Mincho ProN', cursive;
+  font-size: clamp(36px, 6vw, 80px);
+  font-weight: bold;
+  color: rgba(255,255,255,0.20);
+  line-height: 1.4;
+  letter-spacing: 0.05em;
+  user-select: none;
+}
 #controls, #page {
   position: relative;
   z-index: 1;
@@ -265,6 +283,8 @@ body::after {
 </head>
 <body>
 
+<div id="bg-text"></div>
+
 <div id="controls">
   <button id="signin-btn" onclick="handleSignIn()">Googleでサインイン</button>
   <button onclick="loadCalendar()" id="load-btn" style="display:none">📅 予定を読み込む</button>
@@ -297,6 +317,23 @@ body::after {
 </div>
 
 <script>
+(function() {
+  const phrases = [
+    '書くことは\n生きること',
+    '今日という日は\n二度と来ない',
+    '記録は\n未来への手紙',
+    '一行が\n一歩になる',
+    '書けば\n前に進める',
+    '今日の自分を\n残しておこう',
+    'The best time\nto write is now',
+    '人生は\n書いた分だけ面白い',
+    'Small steps,\nbig journey',
+    '今日も\n自分らしく',
+  ];
+  const phrase = phrases[Math.floor(Math.random() * phrases.length)];
+  document.getElementById('bg-text').textContent = phrase;
+})();
+
 (async function() {
   const PEXELS_KEY = 'JK8iPRF0Qq6bMAIicPJ5mpHPokHDWNclw4hvrMzgvTOxbwpLjkxEnW8S';
   const queries = ['nature landscape','mountain sunrise','ocean beach morning','forest light','lake reflection','cherry blossom japan','green field sky'];
