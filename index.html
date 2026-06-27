@@ -424,56 +424,79 @@ body::after {
 <script>
 (async function() {
   const CACHE_KEY = 'journal_book_cache';
-  const CACHE_TTL = 24 * 60 * 60 * 1000; // 24時間
+  const CACHE_TTL = 24 * 60 * 60 * 1000;
+
+  /* 有名書籍フォールバックリスト（cover_i は Open Library の確実なID）*/
+  const fallback = [
+    { title: 'Atomic Habits',          author: 'James Clear',        cover_i: 10519105 },
+    { title: 'Sapiens',                author: 'Yuval Noah Harari',  cover_i: 8739161  },
+    { title: 'Thinking, Fast and Slow',author: 'Daniel Kahneman',    cover_i: 8123177  },
+    { title: 'The Alchemist',          author: 'Paulo Coelho',       cover_i: 8406786  },
+    { title: '1984',                   author: 'George Orwell',      cover_i: 8575708  },
+    { title: 'Man\'s Search for Meaning',author:'Viktor Frankl',     cover_i: 9820066  },
+    { title: 'The Power of Now',       author: 'Eckhart Tolle',      cover_i: 8228691  },
+    { title: 'Deep Work',              author: 'Cal Newport',        cover_i: 8810494  },
+    { title: 'Meditations',            author: 'Marcus Aurelius',    cover_i: 8131541  },
+    { title: 'The Obstacle Is the Way',author: 'Ryan Holiday',       cover_i: 8731156  },
+  ];
 
   function showBook(b) {
+    const panel = document.getElementById('book-panel');
+    panel.style.display = '';
     const imgEl = document.getElementById('book-img');
     imgEl.src = b.imgUrl;
-    imgEl.onerror = () => { document.getElementById('book-panel').style.display='none'; };
+    imgEl.onerror = () => {
+      /* 画像失敗時はフォールバックリストからランダムに試す */
+      const fb = fallback[Math.floor(Math.random() * fallback.length)];
+      imgEl.onerror = () => { panel.style.display = 'none'; };
+      imgEl.src = `https://covers.openlibrary.org/b/id/${fb.cover_i}-L.jpg`;
+      document.getElementById('book-title').textContent = fb.title;
+      document.getElementById('book-author').textContent = fb.author;
+      setLinks(fb.title, fb.author);
+    };
     document.getElementById('book-title').textContent = b.title;
     document.getElementById('book-author').textContent = b.author;
+    setLinks(b.title, b.author);
+  }
+
+  function setLinks(title, author) {
     document.getElementById('book-amazon').href =
-      `https://www.amazon.co.jp/s?k=${encodeURIComponent(b.title+' '+b.author)}`;
+      `https://www.amazon.co.jp/s?k=${encodeURIComponent(title + ' ' + author)}`;
     document.getElementById('book-search').href =
-      `https://www.google.com/search?q=${encodeURIComponent(b.title+' '+b.author)}`;
+      `https://www.google.com/search?q=${encodeURIComponent(title + ' ' + author)}`;
   }
 
   /* キャッシュ確認 */
   try {
     const cached = JSON.parse(localStorage.getItem(CACHE_KEY) || 'null');
-    if (cached && Date.now() - cached.ts < CACHE_TTL) {
-      showBook(cached); return;
-    }
+    if (cached && Date.now() - cached.ts < CACHE_TTL) { showBook(cached); return; }
   } catch(_) {}
 
-  /* キャッシュなし or 期限切れ → Open Library API（キー不要）*/
-  const queries = [
-    'subject:bestseller','subject:fiction','subject:self-help',
-    'subject:philosophy','subject:psychology','subject:history',
-    'subject:biography','subject:science','subject:mystery','subject:thriller',
-  ];
-  const q = queries[Math.floor(Math.random() * queries.length)];
+  /* Open Library トレンドAPIを試す */
   try {
-    const res = await fetch(
-      `https://openlibrary.org/search.json?q=${encodeURIComponent(q)}&limit=50`
-    );
+    const res = await fetch('https://openlibrary.org/trending/daily.json?limit=20');
     if (!res.ok) throw new Error(res.status);
     const data = await res.json();
-    /* カバー画像があるものだけ */
-    const items = (data.docs || []).filter(d => d.cover_i);
-    if (!items.length) throw new Error('no items');
-    const book = items[Math.floor(Math.random() * Math.min(items.length, 30))];
-    const imgUrl = `https://covers.openlibrary.org/b/id/${book.cover_i}-L.jpg`;
+    const works = (data.works || []).filter(w => w.cover_i);
+    if (!works.length) throw new Error('no covers');
+    const w = works[Math.floor(Math.random() * works.length)];
     const b = {
-      imgUrl,
-      title: book.title || '',
-      author: (book.author_name||[]).slice(0,1).join(''),
+      imgUrl: `https://covers.openlibrary.org/b/id/${w.cover_i}-L.jpg`,
+      title:  w.title || '',
+      author: (w.author_name||[]).slice(0,1).join(''),
       ts: Date.now(),
     };
     localStorage.setItem(CACHE_KEY, JSON.stringify(b));
     showBook(b);
   } catch(e) {
-    document.getElementById('book-panel').style.display = 'none';
+    /* APIが失敗したらフォールバックリストをそのまま使う */
+    const fb = fallback[Math.floor(Math.random() * fallback.length)];
+    const b = {
+      imgUrl: `https://covers.openlibrary.org/b/id/${fb.cover_i}-L.jpg`,
+      title: fb.title, author: fb.author, ts: Date.now(),
+    };
+    localStorage.setItem(CACHE_KEY, JSON.stringify(b));
+    showBook(b);
   }
 })();
 
