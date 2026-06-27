@@ -117,10 +117,13 @@ body::after {
   position: fixed;
   top: 50%;
   left: calc(50% + 105mm + 24px);
+  right: 20px;
+  max-width: 320px;
   transform: translateY(-50%);
   z-index: 0;
   pointer-events: none;
   text-align: left;
+  word-break: break-word;
   font-family: 'Shippori Mincho', 'Segoe Script', 'Brush Script MT', serif;
   font-size: clamp(28px, 4vw, 64px);
   font-weight: bold;
@@ -481,14 +484,41 @@ body::after {
     if (cached && Date.now() - cached.ts < CACHE_TTL) { showBook(cached); return; }
   } catch(_) {}
 
-  /* APIなし — ハードコードリストからランダムに選ぶだけ */
-  const fb = fallback[Math.floor(Math.random() * fallback.length)];
-  const b = {
-    imgUrl: gbUrl(fb.gid),
-    title: fb.title, author: fb.author, ts: Date.now(),
-  };
-  localStorage.setItem(CACHE_KEY, JSON.stringify(b));
-  showBook(b);
+  /* Google Books API で日本語書籍を検索 */
+  const queries = [
+    '嫌われる勇気','流浪の月','コンビニ人間','火花 又吉',
+    '羊と鋼の森','夜は短し歩けよ乙女','52ヘルツのクジラたち',
+    'サピエンス全史 日本語','メモの魔力','影響力の武器 日本語',
+  ];
+  const q = queries[Math.floor(Math.random() * queries.length)];
+  try {
+    const res = await fetch(
+      `https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(q)}&maxResults=5&langRestrict=ja&printType=books`
+    );
+    if (!res.ok) throw new Error(res.status);
+    const data = await res.json();
+    const items = (data.items || []).filter(v => v.volumeInfo.imageLinks);
+    if (!items.length) throw new Error('no items');
+    const item = items[0];
+    const info = item.volumeInfo;
+    const links = info.imageLinks;
+    const imgUrl = (links.medium || links.thumbnail)
+      .replace('http://', 'https://')
+      .replace('zoom=1', 'zoom=2');
+    const b = {
+      imgUrl, title: info.title || '',
+      author: (info.authors||[]).slice(0,1).join(''),
+      ts: Date.now(),
+    };
+    localStorage.setItem(CACHE_KEY, JSON.stringify(b));
+    showBook(b);
+  } catch(e) {
+    /* 429など失敗時はフォールバックリストを使用 */
+    const fb = fallback[Math.floor(Math.random() * fallback.length)];
+    const b = { imgUrl: gbUrl(fb.gid), title: fb.title, author: fb.author, ts: Date.now() };
+    localStorage.setItem(CACHE_KEY, JSON.stringify(b));
+    showBook(b);
+  }
 })();
 
 (function() {
