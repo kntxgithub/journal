@@ -23,7 +23,7 @@ body {
 #book-panel {
   position: fixed;
   top: 50%;
-  left: 20px;
+  left: calc(50% - 105mm - 30px - 148px);
   transform: translateY(-50%);
   width: 148px;
   display: flex;
@@ -115,9 +115,9 @@ body::after {
 #bg-text {
   position: fixed;
   top: 50%;
-  left: calc(50% + 105mm + 24px);
+  left: calc(50% + 105mm + 30px);
   right: 20px;
-  max-width: 320px;
+  max-width: calc(50vw - 105mm - 50px);
   transform: translateY(-50%);
   z-index: 0;
   pointer-events: none;
