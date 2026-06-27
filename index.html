@@ -426,19 +426,28 @@ body::after {
   const CACHE_KEY = 'journal_book_v3';
   const CACHE_TTL = 24 * 60 * 60 * 1000;
 
-  /* 有名書籍フォールバックリスト（cover_i は Open Library の確実なID）*/
+  /* 日本語人気書籍フォールバックリスト（Google Books volume ID）*/
   const fallback = [
-    { title: 'Atomic Habits',          author: 'James Clear',        cover_i: 10519105 },
-    { title: 'Sapiens',                author: 'Yuval Noah Harari',  cover_i: 8739161  },
-    { title: 'Thinking, Fast and Slow',author: 'Daniel Kahneman',    cover_i: 8123177  },
-    { title: 'The Alchemist',          author: 'Paulo Coelho',       cover_i: 8406786  },
-    { title: '1984',                   author: 'George Orwell',      cover_i: 8575708  },
-    { title: 'Man\'s Search for Meaning',author:'Viktor Frankl',     cover_i: 9820066  },
-    { title: 'The Power of Now',       author: 'Eckhart Tolle',      cover_i: 8228691  },
-    { title: 'Deep Work',              author: 'Cal Newport',        cover_i: 8810494  },
-    { title: 'Meditations',            author: 'Marcus Aurelius',    cover_i: 8131541  },
-    { title: 'The Obstacle Is the Way',author: 'Ryan Holiday',       cover_i: 8731156  },
-  ];
+    { title: '嫌われる勇気',              author: '岸見一郎・古賀史健', gid: 'GrNOmQEACAAJ' },
+    { title: '君たちはどう生きるか',        author: '吉野源三郎',        gid: 'dRu3DwAAQBAJ' },
+    { title: 'コンビニ人間',              author: '村田沙耶香',         gid: 'Aq1iDQAAQBAJ' },
+    { title: '火花',                     author: '又吉直樹',           gid: 'cU4vCwAAQBAJ' },
+    { title: '流浪の月',                 author: '凪良ゆう',           gid: 'Rqf3DwAAQBAJ' },
+    { title: '52ヘルツのクジラたち',       author: '町田そのこ',         gid: 'xkMhEAAAQBAJ' },
+    { title: '人間失格',                 author: '太宰治',             gid: 'tPhuDwAAQBAJ' },
+    { title: 'サピエンス全史（上）',        author: 'ユヴァル・ノア・ハラリ', gid: 'BC4rDQAAQBAJ' },
+    { title: 'ゼロ・トゥ・ワン',           author: 'ピーター・ティール',   gid: 'Ra1oBQAAQBAJ' },
+    { title: '夜は短し歩けよ乙女',         author: '森見登美彦',          gid: '2lJmDwAAQBAJ' },
+    { title: '羊と鋼の森',               author: '宮下奈都',           gid: 'lSZHDwAAQBAJ' },
+    { title: 'メモの魔力',               author: '前田裕二',           gid: 'Tv6JDwAAQBAJ' },
+    { title: '影響力の武器',             author: 'ロバート・B・チャルディーニ', gid: 'oUqFDwAAQBAJ' },
+    { title: '本好きの下剋上',           author: '香月美夜',           gid: 'TU5tDwAAQBAJ' },
+    { title: '新・人間革命',             author: '池田大作',           gid: 'placeholder'  },
+  ].filter(b => b.gid !== 'placeholder');
+
+  function gbUrl(gid) {
+    return `https://books.google.com/books/content?id=${gid}&printsec=frontcover&img=1&zoom=2&source=gbs_api`;
+  }
 
   function showBook(b) {
     const panel = document.getElementById('book-panel');
@@ -446,10 +455,10 @@ body::after {
     const imgEl = document.getElementById('book-img');
     imgEl.src = b.imgUrl;
     imgEl.onerror = () => {
-      /* 画像失敗時はフォールバックリストからランダムに試す */
+      /* 失敗時は別のフォールバック本を試す */
       const fb = fallback[Math.floor(Math.random() * fallback.length)];
       imgEl.onerror = () => { panel.style.display = 'none'; };
-      imgEl.src = `https://covers.openlibrary.org/b/id/${fb.cover_i}-L.jpg`;
+      imgEl.src = gbUrl(fb.gid);
       document.getElementById('book-title').textContent = fb.title;
       document.getElementById('book-author').textContent = fb.author;
       setLinks(fb.title, fb.author);
@@ -475,7 +484,7 @@ body::after {
   /* APIなし — ハードコードリストからランダムに選ぶだけ */
   const fb = fallback[Math.floor(Math.random() * fallback.length)];
   const b = {
-    imgUrl: `https://covers.openlibrary.org/b/id/${fb.cover_i}-L.jpg`,
+    imgUrl: gbUrl(fb.gid),
     title: fb.title, author: fb.author, ts: Date.now(),
   };
   localStorage.setItem(CACHE_KEY, JSON.stringify(b));
