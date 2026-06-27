@@ -425,46 +425,34 @@ body::after {
 
 <script>
 (async function() {
-  const CACHE_KEY = 'journal_book_v4';
+  const CACHE_KEY = 'journal_book_v5';
   const CACHE_TTL = 24 * 60 * 60 * 1000;
 
-  /* 日本語人気書籍フォールバックリスト（Google Books volume ID）*/
+  /* 2022〜2024年 本屋大賞・直木賞・ベストセラー */
   const fallback = [
-    { title: '嫌われる勇気',              author: '岸見一郎・古賀史健', gid: 'GrNOmQEACAAJ' },
-    { title: '君たちはどう生きるか',        author: '吉野源三郎',        gid: 'dRu3DwAAQBAJ' },
-    { title: 'コンビニ人間',              author: '村田沙耶香',         gid: 'Aq1iDQAAQBAJ' },
-    { title: '火花',                     author: '又吉直樹',           gid: 'cU4vCwAAQBAJ' },
-    { title: '流浪の月',                 author: '凪良ゆう',           gid: 'Rqf3DwAAQBAJ' },
-    { title: '52ヘルツのクジラたち',       author: '町田そのこ',         gid: 'xkMhEAAAQBAJ' },
-    { title: '人間失格',                 author: '太宰治',             gid: 'tPhuDwAAQBAJ' },
-    { title: 'サピエンス全史（上）',        author: 'ユヴァル・ノア・ハラリ', gid: 'BC4rDQAAQBAJ' },
-    { title: 'ゼロ・トゥ・ワン',           author: 'ピーター・ティール',   gid: 'Ra1oBQAAQBAJ' },
-    { title: '夜は短し歩けよ乙女',         author: '森見登美彦',          gid: '2lJmDwAAQBAJ' },
-    { title: '羊と鋼の森',               author: '宮下奈都',           gid: 'lSZHDwAAQBAJ' },
-    { title: 'メモの魔力',               author: '前田裕二',           gid: 'Tv6JDwAAQBAJ' },
-    { title: '影響力の武器',             author: 'ロバート・B・チャルディーニ', gid: 'oUqFDwAAQBAJ' },
-    { title: '本好きの下剋上',           author: '香月美夜',           gid: 'TU5tDwAAQBAJ' },
-    { title: '新・人間革命',             author: '池田大作',           gid: 'placeholder'  },
-  ].filter(b => b.gid !== 'placeholder');
-
-  function gbUrl(gid) {
-    return `https://books.google.com/books/content?id=${gid}&printsec=frontcover&img=1&zoom=2&source=gbs_api`;
-  }
+    { title: '成瀬は天下を取りにいく',      author: '宮島未奈'   },
+    { title: '汝、星のごとく',            author: '凪良ゆう'   },
+    { title: '同志少女よ、敵を撃て',        author: '逢坂冬馬'   },
+    { title: '黒牢城',                   author: '米澤穂信'   },
+    { title: '推し、燃ゆ',               author: '宇佐見りん' },
+    { title: 'ラブカは静かに弓を持つ',      author: '安壇美緒'   },
+    { title: '水車小屋のネネ',            author: '津村記久子' },
+    { title: '君が手にするはずだった黄金について', author: '小川哲' },
+    { title: '存在のすべてを',            author: '塩田武士'   },
+    { title: '光のとこにいてね',           author: '一穂ミチ'   },
+    { title: 'ゴールデンスランバー',        author: '伊坂幸太郎' },
+    { title: 'DIE WITH ZERO',           author: 'ビル・パーキンス' },
+    { title: 'THE TEAM 5つの法則',      author: '麻野耕司'   },
+    { title: '言語化の魔力',             author: '樺沢紫苑'   },
+    { title: 'ライフシフト２',            author: 'リンダ・グラットン' },
+  ];
 
   function showBook(b) {
     const panel = document.getElementById('book-panel');
     panel.style.display = '';
     const imgEl = document.getElementById('book-img');
     imgEl.src = b.imgUrl;
-    imgEl.onerror = () => {
-      /* 失敗時は別のフォールバック本を試す */
-      const fb = fallback[Math.floor(Math.random() * fallback.length)];
-      imgEl.onerror = () => { panel.style.display = 'none'; };
-      imgEl.src = gbUrl(fb.gid);
-      document.getElementById('book-title').textContent = fb.title;
-      document.getElementById('book-author').textContent = fb.author;
-      setLinks(fb.title, fb.author);
-    };
+    imgEl.onerror = () => { panel.style.display = 'none'; };
     document.getElementById('book-title').textContent = b.title;
     document.getElementById('book-author').textContent = b.author;
     setLinks(b.title, b.author);
@@ -485,9 +473,10 @@ body::after {
 
   /* Google Books API で日本語書籍を検索 */
   const queries = [
-    '嫌われる勇気','流浪の月','コンビニ人間','火花 又吉',
-    '羊と鋼の森','夜は短し歩けよ乙女','52ヘルツのクジラたち',
-    'サピエンス全史 日本語','メモの魔力','影響力の武器 日本語',
+    '成瀬は天下を取りにいく','汝、星のごとく','同志少女よ、敵を撃て',
+    '黒牢城 米澤穂信','推し、燃ゆ','水車小屋のネネ',
+    '存在のすべてを 塩田武士','光のとこにいてね','言語化の魔力',
+    'ライフシフト２ 日本語',
   ];
   const q = queries[Math.floor(Math.random() * queries.length)];
   try {
@@ -512,11 +501,7 @@ body::after {
     localStorage.setItem(CACHE_KEY, JSON.stringify(b));
     showBook(b);
   } catch(e) {
-    /* 429など失敗時はフォールバックリストを使用 */
-    const fb = fallback[Math.floor(Math.random() * fallback.length)];
-    const b = { imgUrl: gbUrl(fb.gid), title: fb.title, author: fb.author, ts: Date.now() };
-    localStorage.setItem(CACHE_KEY, JSON.stringify(b));
-    showBook(b);
+    document.getElementById('book-panel').style.display = 'none';
   }
 })();
 
