@@ -9,12 +9,24 @@
 
 body {
   font-family: 'Segoe UI', 'Meiryo', sans-serif;
-  background: #c8c4b8;
+  background: #4a7a8a center center / cover no-repeat fixed;
   display: flex;
   flex-direction: column;
   align-items: center;
   padding: 20px;
   min-height: 100vh;
+}
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.15);
+  z-index: 0;
+  pointer-events: none;
+}
+#controls, #page {
+  position: relative;
+  z-index: 1;
 }
 
 /* ===== コントロールバー ===== */
@@ -285,6 +297,24 @@ body {
 </div>
 
 <script>
+(async function() {
+  const PEXELS_KEY = 'JK8iPRF0Qq6bMAIicPJ5mpHPokHDWNclw4hvrMzgvTOxbwpLjkxEnW8S';
+  const queries = ['nature landscape','mountain sunrise','ocean beach morning','forest light','lake reflection','cherry blossom japan','green field sky'];
+  const q = queries[Math.floor(Math.random() * queries.length)];
+  try {
+    const res = await fetch(
+      `https://api.pexels.com/v1/search?query=${encodeURIComponent(q)}&per_page=20&orientation=landscape`,
+      { headers: { Authorization: PEXELS_KEY } }
+    );
+    const data = await res.json();
+    const photos = data.photos || [];
+    if (photos.length) {
+      const photo = photos[Math.floor(Math.random() * photos.length)];
+      document.body.style.backgroundImage = `url('${photo.src.large2x}')`;
+    }
+  } catch(e) { console.warn('背景取得失敗:', e); }
+})();
+
 (function() {
   const now = new Date();
   const days = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
