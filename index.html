@@ -9,12 +9,20 @@
 
 body {
   font-family: 'Segoe UI', 'Meiryo', sans-serif;
-  background: #ddd9ce;
+  background: #ddd9ce center center / cover no-repeat fixed;
   display: flex;
   flex-direction: column;
   align-items: center;
   padding: 20px;
   min-height: 100vh;
+}
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: inherit;
+  filter: brightness(0.55) saturate(0.85);
+  z-index: -1;
 }
 
 /* ===== コントロールバー ===== */
@@ -193,7 +201,7 @@ body {
 .col-bullet {
   width: 8mm;
   display: flex;
-  align-items: flex-end;
+  align-items: center;
   justify-content: center;
   color: #222;
   font-size: 17px;
@@ -306,6 +314,14 @@ body {
 </div>
 
 <script>
+/* ===== 背景画像（Unsplash ランダム）===== */
+(function() {
+  const keywords = ['portrait woman','fashion woman','beautiful woman','elegant woman','model portrait'];
+  const kw = keywords[Math.floor(Math.random() * keywords.length)];
+  const url = `https://source.unsplash.com/1920x1080/?${encodeURIComponent(kw)}&sig=${Date.now()}`;
+  document.body.style.backgroundImage = `url('${url}')`;
+})();
+
 /* ===== 日付 ===== */
 (function() {
   const now = new Date();
