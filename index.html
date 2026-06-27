@@ -321,34 +321,76 @@ body::after {
 <script>
 (function() {
   const phrases = [
-    '書くことは\n生きること',
-    '今日という日は\n二度と来ない',
-    '記録は\n未来への手紙',
-    '一行が\n一歩になる',
-    '書けば\n前に進める',
-    '今日の自分を\n残しておこう',
-    '人生は\n書いた分だけ面白い',
-    '今日も\n自分らしく',
-    '千里の道も\n一歩から',
-    '継続は\n力なり',
-    '昨日より\n少しだけ前へ',
-    '迷ったら\n書け',
-    '思考は\n文字になって初めて生きる',
-    '今日の積み重ねが\n明日の自分をつくる',
-    '振り返る勇気が\n前進する力になる',
-    '静かな朝に\n自分と向き合う',
-    '言葉にすると\n気持ちが整う',
-    '小さな記録が\n大きな地図になる',
-    '余白に\n本音が宿る',
-    '今日という贈り物を\n丁寧に開けよう',
-    'The secret of\ngetting ahead\nis getting started',
-    'Write it down,\nmake it happen',
-    'One day or\nday one — you decide',
-    'Small steps,\nbig journey',
-    'The best time\nto write is now',
-    'Begin anywhere.',
-    'Clarity comes\nfrom action',
-    'Done is better\nthan perfect',
+    /* Gandhi */
+    '明日死ぬかのように生きろ\n永遠に生きるかのように学べ',
+    /* Steve Jobs */
+    '今日が人生最後の日だとしたら\n今日することは本当にやりたいことか',
+    /* Churchill */
+    '成功とは\n情熱を失わずに\n失敗を重ねることだ',
+    /* Mark Twain */
+    '二十年後\nやったことよりも\nやらなかったことを後悔する',
+    /* Nietzsche */
+    '生きる理由を持つ者は\nいかなる状況にも耐えられる',
+    /* Einstein */
+    '昨日と同じことを繰り返しながら\n異なる結果を望むのは狂気だ',
+    /* Einstein */
+    '想像力は\n知識よりも重要だ',
+    /* Helen Keller */
+    '人生は大胆な冒険か\n無かのどちらかだ',
+    /* Marcus Aurelius */
+    '心を支配する者が\n人生を支配する',
+    /* Marcus Aurelius */
+    '今この瞬間に集中せよ\n過去は死に\n未来はまだ生まれていない',
+    /* Seneca */
+    '人生は短いのではない\n我々が長く使わないだけだ',
+    /* Seneca */
+    'どこにでもいる者は\nどこにもいない',
+    /* Rumi */
+    '傷口は\n光の差し込む場所だ',
+    /* Dostoevsky */
+    '人は苦しみによってのみ\n鍛えられる',
+    /* Hemingway */
+    '世界はすべての人を壊す\nしかし壊れた場所が\n強くなる者もいる',
+    /* Napoleon */
+    '不可能とは\n小さな人間の辞書にある言葉だ',
+    /* 宮本武蔵 */
+    '千日の稽古を鍛とし\n万日の稽古を錬とす',
+    /* 坂本龍馬 */
+    '世の人は我を何とも言わば言え\n我が成すことは我のみぞ知る',
+    /* 孔子 */
+    '学びて思わざれば則ち罔し\n思いて学ばざれば則ち殆し',
+    /* 吉田松陰 */
+    '夢なき者に理想なく\n理想なき者に計画なく\n計画なき者に実行なし',
+    /* 西郷隆盛 */
+    '人を相手にせず\n天を相手にせよ',
+    /* 松下幸之助 */
+    '失敗の原因を素直に認め\nそれを糧として前進する',
+    /* 本田宗一郎 */
+    '成功とは\n99%の失敗に支えられた\n1%だ',
+    /* Aristotle */
+    '優秀さは\n行為ではなく習慣だ',
+    /* Darwin */
+    '生き残るのは\n最も強い者でも賢い者でもなく\n変化に適応した者だ',
+    /* Picasso */
+    '行動こそが\nすべての成功の基本となる',
+    /* Leonardo da Vinci */
+    '学ぶことをやめた者は\n老いている\n学び続ける者は\nいつまでも若い',
+    /* Voltaire */
+    '完璧は\n善の敵だ',
+    /* Thoreau */
+    '自信を持って\n夢の方向へ歩め\n思い描いた人生を\n生きよ',
+    /* Ralph Waldo Emerson */
+    '人生とは\nあなたが考えたとおりのものだ',
+    /* Lao Tzu */
+    '千里の道も\n一歩から始まる',
+    /* Lao Tzu */
+    '知人を知る者は賢く\n自分を知る者は悟る',
+    'One day or\nday one —\nyou decide',
+    'The obstacle is\nthe way',
+    'Do what you can,\nwith what you have,\nwhere you are',
+    'Fail fast,\nlearn faster',
+    'Be the change\nyou wish to\nsee in the world',
+    'It always seems\nimpossible\nuntil it\'s done',
   ];
   const phrase = phrases[Math.floor(Math.random() * phrases.length)];
   document.getElementById('bg-text').textContent = phrase;
