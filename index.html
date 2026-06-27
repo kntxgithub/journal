@@ -9,20 +9,55 @@
 
 body {
   font-family: 'Segoe UI', 'Meiryo', sans-serif;
-  background: #ddd9ce center center / cover no-repeat fixed;
+  background: #2a2a2a;
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 20px;
+  min-height: 100vh;
+  gap: 20px;
+}
+
+/* 右側の写真パネル */
+#photo-panel {
+  width: 320px;
+  min-width: 220px;
+  position: sticky;
+  top: 20px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+#photo-frame {
+  width: 100%;
+  aspect-ratio: 2 / 3;
+  border-radius: 4px;
+  overflow: hidden;
+  box-shadow: 0 6px 32px rgba(0,0,0,0.5);
+  background: #444;
+}
+#photo-frame img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top center;
+  display: block;
+}
+#photo-credit {
+  font-size: 10px;
+  color: #888;
+  text-align: right;
+}
+#photo-credit a { color: #aaa; text-decoration: none; }
+
+/* 左側：コントロール＋用紙 */
+#left-col {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 20px;
-  min-height: 100vh;
-}
-body::before {
-  content: '';
-  position: fixed;
-  inset: 0;
-  background: inherit;
-  filter: brightness(0.55) saturate(0.85);
-  z-index: -1;
+  gap: 10px;
 }
 
 /* ===== コントロールバー ===== */
@@ -278,6 +313,7 @@ body::before {
 </head>
 <body>
 
+<div id="left-col">
 <div id="controls">
   <button id="signin-btn" onclick="handleSignIn()">Googleでサインイン</button>
   <button onclick="loadCalendar()" id="load-btn" style="display:none">📅 予定を読み込む</button>
@@ -311,26 +347,34 @@ body::before {
   <div id="body-rows"></div>
 
 
+</div><!-- /page -->
+</div><!-- /left-col -->
+
+<div id="photo-panel">
+  <div id="photo-frame"><img id="bg-photo" src="" alt=""/></div>
+  <div id="photo-credit"></div>
 </div>
 
 <script>
-/* ===== 背景画像（Pexels ランダム）===== */
+/* ===== 写真パネル（Pexels ランダム）===== */
 (async function() {
   const PEXELS_KEY = 'JK8iPRF0Qq6bMAIicPJ5mpHPokHDWNclw4hvrMzgvTOxbwpLjkxEnW8S';
   const queries = ['japanese woman portrait','japanese beauty','asian woman fashion','japanese model'];
   const q = queries[Math.floor(Math.random() * queries.length)];
   try {
     const res = await fetch(
-      `https://api.pexels.com/v1/search?query=${encodeURIComponent(q)}&per_page=20&orientation=landscape`,
+      `https://api.pexels.com/v1/search?query=${encodeURIComponent(q)}&per_page=20&orientation=portrait`,
       { headers: { Authorization: PEXELS_KEY } }
     );
     const data = await res.json();
     const photos = data.photos || [];
     if (photos.length) {
       const photo = photos[Math.floor(Math.random() * photos.length)];
-      document.body.style.backgroundImage = `url('${photo.src.large2x}')`;
+      document.getElementById('bg-photo').src = photo.src.large;
+      const credit = document.getElementById('photo-credit');
+      credit.innerHTML = `Photo by <a href="${photo.photographer_url}" target="_blank">${photo.photographer}</a> on <a href="https://www.pexels.com" target="_blank">Pexels</a>`;
     }
-  } catch(e) { console.warn('背景画像の取得に失敗:', e); }
+  } catch(e) { console.warn('写真の取得に失敗:', e); }
 })();
 
 /* ===== 日付 ===== */
