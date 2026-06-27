@@ -571,7 +571,16 @@ function buildWeekPage(day, events) {
   // ヘッダー
   const hdr = document.createElement('div');
   hdr.className = 'wp-hdr';
-  hdr.innerHTML = `<div style="font-family:'Segoe Script',cursive;font-size:20px;min-width:110px">${fmtHeader(day)}</div>`;
+  hdr.innerHTML = `
+    <div style="font-family:'Segoe Script',cursive;font-size:20px;min-width:110px">${fmtHeader(day)}</div>
+    <div class="hfields">
+      <span class="hf wx"><label>WX:</label><input type="text"/></span>
+      <span class="hf"><label>PS:</label><input type="text"/></span>
+      <span class="hf"><label>MS:</label><input type="text"/></span>
+      <span class="hf st"><label>ST:</label><input type="text"/></span>
+      <span class="hf"><label>feel:</label><input type="text"/></span>
+      <span class="hf no"><label>No.</label><input type="text"/></span>
+    </div>`;
   pg.appendChild(hdr);
   const hdr2 = document.createElement('div');
   hdr2.className = 'wp-hdr2';
