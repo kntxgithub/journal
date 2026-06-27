@@ -9,57 +9,13 @@
 
 body {
   font-family: 'Segoe UI', 'Meiryo', sans-serif;
-  background: #2a2a2a;
+  background: #c8c4b8;
   display: flex;
-  flex-direction: row;
-  align-items: flex-start;
-  justify-content: flex-start;
+  flex-direction: column;
+  align-items: center;
   padding: 20px;
   min-height: 100vh;
-  gap: 0;
-  overflow-x: hidden;
 }
-
-/* 左側：コントロール＋用紙 */
-#left-col {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 10px;
-  flex-shrink: 0;
-  margin-right: 16px;
-}
-
-/* 右側の写真パネル */
-#photo-panel {
-  position: sticky;
-  top: 20px;
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  overflow: hidden;
-}
-#photo-frame {
-  width: 100%;
-  height: 297mm;
-  overflow: hidden;
-  background: #333;
-}
-#photo-frame img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: left center;
-  display: block;
-}
-#photo-credit {
-  font-size: 10px;
-  color: #666;
-  text-align: left;
-  padding-left: 4px;
-}
-#photo-credit a { color: #888; text-decoration: none; }
 
 /* ===== コントロールバー ===== */
 #controls {
@@ -98,7 +54,7 @@ body {
   overflow: hidden;
 }
 
-/* ===== 縦線 2本：body-rows に限定（タイトル行・ヘッダーに侵入しない）===== */
+/* ===== 縦線 2本：body-rows に限定 ===== */
 #body-rows {
   position: relative;
 }
@@ -106,7 +62,6 @@ body {
   content: '';
   position: absolute;
   top: 0; bottom: 0;
-  /* bullet幅(8mm) + page左padding(14mm) = 22mm → padding分は親が持つので相対で bullet幅のみ */
   left: 8mm;
   width: 1.2px;
   background: #b03030;
@@ -128,12 +83,10 @@ body {
 #header {
   display: flex;
   align-items: baseline;
-  gap: 0;
   padding-bottom: 3px;
   border-bottom: 2.5px solid #2c2c2c;
   margin-bottom: 1px;
 }
-/* 二重線 */
 #header-line2 {
   border-bottom: 1px solid #2c2c2c;
   margin-bottom: 3px;
@@ -179,10 +132,7 @@ body {
 }
 .hf.wx input { width: 96px; }
 .hf.st input { width: 42px; }
-.hf.no {
-  margin-left: auto;
-}
-.hf.no label { font-size: 13px; }
+.hf.no { margin-left: auto; }
 .hf.no input { width: 44px; text-align: right; }
 
 /* ===== タイトル行 ===== */
@@ -192,7 +142,6 @@ body {
   border-bottom: 2px solid #7a9fc0;
   min-height: 9mm;
   padding: 2px 0 2px 2px;
-  margin-bottom: 0;
 }
 #title-row .title-label {
   font-family: 'Segoe Script', cursive;
@@ -228,11 +177,7 @@ body {
   min-height: 0;
   position: relative;
 }
-
-/* 予定あり行の罫線は少し濃く */
-.row.has-event {
-  border-bottom-color: #a0b0c4;
-}
+.row.has-event { border-bottom-color: #a0b0c4; }
 
 .col-bullet {
   width: 8mm;
@@ -246,7 +191,6 @@ body {
   padding-bottom: 1px;
 }
 
-/* 時間列：左縦線〜右縦線の間 */
 .col-time {
   width: 26mm;
   padding: 0 3px 1px;
@@ -265,7 +209,6 @@ body {
   font-family: 'Segoe UI', sans-serif;
 }
 
-/* 詳細列 */
 .col-detail {
   flex: 1;
   display: flex;
@@ -291,10 +234,8 @@ body {
   font-family: 'Segoe UI', 'Meiryo', sans-serif;
 }
 
-/* 空白行は時間・詳細を薄く */
 .row.empty-row .col-time input { color: #ddd; }
 .row.empty-row .col-detail input { color: #ddd; }
-
 
 /* ===== 印刷 ===== */
 @media print {
@@ -302,10 +243,8 @@ body {
   body { background: white; padding: 0; }
   #controls { display: none !important; }
   #page { box-shadow: none; }
-  /* 時間・カレンダー名をグレーに（提案2）*/
   .col-time input { color: #aaa !important; }
   .col-calname { color: #bbb !important; }
-  /* 空白行は完全に見えなく */
   .row.empty-row .col-time input,
   .row.empty-row .col-detail input { color: transparent !important; }
   input { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
@@ -314,7 +253,6 @@ body {
 </head>
 <body>
 
-<div id="left-col">
 <div id="controls">
   <button id="signin-btn" onclick="handleSignIn()">Googleでサインイン</button>
   <button onclick="loadCalendar()" id="load-btn" style="display:none">📅 予定を読み込む</button>
@@ -324,7 +262,6 @@ body {
 
 <div id="page">
 
-  <!-- ヘッダー -->
   <div id="header">
     <div id="date-display"></div>
     <div class="hfields">
@@ -338,79 +275,44 @@ body {
   </div>
   <div id="header-line2"></div>
 
-  <!-- タイトル行 -->
   <div id="title-row">
     <span class="title-label">Title:</span>
     <input type="text"/>
   </div>
 
-  <!-- 本文行 -->
   <div id="body-rows"></div>
 
-
-</div><!-- /page -->
-</div><!-- /left-col -->
-
-<div id="photo-panel">
-  <div id="photo-frame"><img id="bg-photo" src="" alt=""/></div>
-  <div id="photo-credit"></div>
 </div>
 
 <script>
-/* ===== 写真パネル（Pexels ランダム）===== */
-(async function() {
-  const PEXELS_KEY = 'JK8iPRF0Qq6bMAIicPJ5mpHPokHDWNclw4hvrMzgvTOxbwpLjkxEnW8S';
-  const queries = ['japanese woman portrait','japanese beauty','asian woman fashion','japanese model'];
-  const q = queries[Math.floor(Math.random() * queries.length)];
-  try {
-    const res = await fetch(
-      `https://api.pexels.com/v1/search?query=${encodeURIComponent(q)}&per_page=20&orientation=portrait`,
-      { headers: { Authorization: PEXELS_KEY } }
-    );
-    const data = await res.json();
-    const photos = data.photos || [];
-    if (photos.length) {
-      const photo = photos[Math.floor(Math.random() * photos.length)];
-      document.getElementById('bg-photo').src = photo.src.large;
-      const credit = document.getElementById('photo-credit');
-      credit.innerHTML = `Photo by <a href="${photo.photographer_url}" target="_blank">${photo.photographer}</a> on <a href="https://www.pexels.com" target="_blank">Pexels</a>`;
-    }
-  } catch(e) { console.warn('写真の取得に失敗:', e); }
-})();
-
-/* ===== 日付 ===== */
 (function() {
   const now = new Date();
-  const dayJa = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  const days = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
   const m = now.getMonth() + 1;
   const d = now.getDate();
-  document.getElementById('date-display').textContent =
-    `${m}/${d}  (${dayJa[now.getDay()]})`;
+  document.getElementById('date-display').textContent = `${m}/${d}  (${days[now.getDay()]})`;
 })();
 
-/* ===== 行生成 ===== */
+let calColorMap = {};
+
 function makeRow(time, calname, detail) {
   const empty = !time && !detail;
   const row = document.createElement('div');
   row.className = 'row' + (empty ? ' empty-row' : ' has-event');
 
-  // bullet
   const b = document.createElement('div');
   b.className = 'col-bullet';
   b.textContent = '•';
   row.appendChild(b);
 
-  // 時間
   const ct = document.createElement('div');
   ct.className = 'col-time';
   const it = document.createElement('input');
   it.type = 'text';
   it.value = time || '';
-  it.placeholder = '';
   ct.appendChild(it);
   row.appendChild(ct);
 
-  // 詳細
   const cd = document.createElement('div');
   cd.className = 'col-detail';
   if (calname) {
@@ -430,27 +332,19 @@ function makeRow(time, calname, detail) {
     row.classList.remove('empty-row');
     row.classList.add('has-event');
   }));
-
   return row;
 }
-
-/* ===== 初期描画（25行）===== */
-let calColorMap = {};
 
 function render(events = []) {
   const container = document.getElementById('body-rows');
   container.innerHTML = '';
-  const total = 25;
-  for (let i = 0; i < total; i++) {
+  for (let i = 0; i < 25; i++) {
     const ev = events[i];
-    container.appendChild(ev
-      ? makeRow(ev.timeStr, ev.calname, ev.detail)
-      : makeRow());
+    container.appendChild(ev ? makeRow(ev.timeStr, ev.calname, ev.detail) : makeRow());
   }
 }
 render();
 
-/* ===== Google OAuth ===== */
 const CLIENT_ID = '616683928852-chp1t7qqigfeeuolpcjbc8e14uueka8i.apps.googleusercontent.com';
 const SCOPES = 'https://www.googleapis.com/auth/calendar.readonly';
 let tokenClient, accessToken;
@@ -478,7 +372,6 @@ function handleSignIn() {
   tokenClient.requestAccessToken({ prompt: 'consent' });
 }
 
-/* ===== カレンダー取得（並列）===== */
 async function loadCalendar() {
   if (!accessToken) return;
   const now = new Date();
@@ -488,7 +381,6 @@ async function loadCalendar() {
     const calList = await gapi.client.calendar.calendarList.list();
     const cals = calList.result.items || [];
 
-    // 全カレンダーを並列取得
     const results = await Promise.all(cals.map(cal =>
       gapi.client.calendar.events.list({
         calendarId: cal.id, timeMin: start, timeMax: end,
@@ -496,7 +388,6 @@ async function loadCalendar() {
       }).then(r => ({ cal, events: r.result.items || [] }))
     ));
 
-    // カレンダー色マップ
     calColorMap = {};
     const googleColors = {
       '1':'#a4bdfc','2':'#7ae7bf','3':'#dbadff','4':'#ff887c',
@@ -508,7 +399,6 @@ async function loadCalendar() {
         (cal.colorId ? googleColors[cal.colorId] : '#888');
     }
 
-    // 全イベントを時刻順にまとめる
     const allEvents = [];
     for (const { cal, events } of results) {
       for (const ev of events) {
@@ -519,10 +409,8 @@ async function loadCalendar() {
       }
     }
     allEvents.sort((a, b) => a._sort.localeCompare(b._sort));
-
     render(allEvents);
 
-    // ユーザー表示
     try {
       const me = await gapi.client.request({ path: 'https://www.googleapis.com/oauth2/v3/userinfo' });
       document.getElementById('user-info').textContent = me.result.email || '';
