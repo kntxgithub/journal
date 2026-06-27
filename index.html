@@ -31,7 +31,8 @@ body {
   align-items: center;
   gap: 10px;
   z-index: 1;
-  margin-top: 46px; /* controlsの高さ分ずらす */
+  margin-top: 46px;
+  margin-right: 20px;
 }
 #book-cover-wrap {
   width: 148px;
@@ -75,6 +76,25 @@ body {
 #book-author {
   font-size: 9px;
   color: rgba(255,255,255,0.45);
+  margin-bottom: 8px;
+}
+#book-links {
+  display: flex;
+  gap: 6px;
+  justify-content: center;
+}
+#book-links a {
+  font-size: 9px;
+  color: rgba(255,255,255,0.55);
+  text-decoration: none;
+  border: 1px solid rgba(255,255,255,0.3);
+  border-radius: 3px;
+  padding: 2px 7px;
+  transition: background 0.2s;
+}
+#book-links a:hover {
+  background: rgba(255,255,255,0.15);
+  color: white;
 }
 
 /* ===== 中央：コントロール＋用紙 ===== */
@@ -361,6 +381,10 @@ body::after {
   <div id="book-meta">
     <div id="book-title"></div>
     <div id="book-author"></div>
+    <div id="book-links">
+      <a id="book-amazon" href="#" target="_blank" rel="noopener">Amazon</a>
+      <a id="book-search" href="#" target="_blank" rel="noopener">検索</a>
+    </div>
   </div>
 </div>
 
@@ -410,18 +434,27 @@ body::after {
       `https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(q)}&maxResults=20&orderBy=relevance&printType=books`
     );
     const data = await res.json();
-    const items = (data.items || []).filter(v =>
-      v.volumeInfo.imageLinks && v.volumeInfo.imageLinks.thumbnail
-    );
-    if (!items.length) return;
+    const items = (data.items || []).filter(v => v.volumeInfo.imageLinks);
+    if (!items.length) { document.getElementById('book-panel').style.display='none'; return; }
     const book = items[Math.floor(Math.random() * items.length)];
     const info = book.volumeInfo;
-    const imgUrl = (info.imageLinks.medium || info.imageLinks.thumbnail)
-      .replace('http://', 'https://').replace('&zoom=1','&zoom=2');
-    document.getElementById('book-img').src = imgUrl;
+
+    /* volume ID を使った確実なカバー画像URL */
+    const imgUrl = `https://books.google.com/books/content/images/frontcover/${book.id}?fife=w300-h450`;
+    const imgEl = document.getElementById('book-img');
+    imgEl.src = imgUrl;
+    imgEl.onerror = () => { document.getElementById('book-panel').style.display='none'; };
+
     document.getElementById('book-title').textContent = info.title || '';
-    document.getElementById('book-author').textContent =
-      (info.authors || []).slice(0,1).join('') || '';
+    document.getElementById('book-author').textContent = (info.authors||[]).slice(0,1).join('');
+
+    /* リンク設定 */
+    const title = info.title || '';
+    const author = (info.authors||[]).slice(0,1).join('');
+    const amazonUrl = `https://www.amazon.co.jp/s?k=${encodeURIComponent(title+' '+author)}`;
+    const searchUrl = `https://www.google.com/search?q=${encodeURIComponent(title+' '+author)}`;
+    document.getElementById('book-amazon').href = amazonUrl;
+    document.getElementById('book-search').href = searchUrl;
   } catch(e) { document.getElementById('book-panel').style.display = 'none'; }
 })();
 
