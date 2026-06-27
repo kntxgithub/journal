@@ -294,13 +294,27 @@ body::after {
 .row.empty-row .col-time input { color: #ddd; }
 .row.empty-row .col-detail input { color: #ddd; }
 
-/* ===== 週ビュー（2ページ横並び・フルサイズ）===== */
+/* ===== 週ビュー：スクロールスナップ ===== */
+/* ビューポート：2ページ分の幅でクリップ */
 #week-viewer {
   display: none;
+  width: calc(210mm * 2 + 20px);
+  overflow-x: scroll;
+  scroll-snap-type: x mandatory;
+  scroll-behavior: smooth;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+#week-viewer::-webkit-scrollbar { display: none; }
+#week-viewer.visible { display: flex; }
+
+/* レール：7枚を横一列 */
+#week-track {
+  display: flex;
   gap: 20px;
   align-items: flex-start;
+  flex-shrink: 0;
 }
-#week-viewer.visible { display: flex; }
 
 .week-page {
   width: 210mm;
@@ -309,12 +323,12 @@ body::after {
   box-shadow: 0 4px 24px rgba(0,0,0,0.28);
   padding: 10mm 10mm 8mm 20mm;
   position: relative;
-  display: none;          /* JS で wp-visible を付けた2枚だけ表示 */
+  display: flex;
   flex-direction: column;
   overflow: hidden;
   flex-shrink: 0;
+  scroll-snap-align: start;
 }
-.week-page.wp-visible { display: flex; }
 .wp-hdr {
   display: flex;
   align-items: baseline;
@@ -365,8 +379,9 @@ body::after {
   body { background: white; padding: 0; }
   #controls, #date-nav, #week-nav { display: none !important; }
   #page { box-shadow: none; }
-  .week-page { display: flex !important; box-shadow: none; page-break-after: always; }
-  #week-viewer { display: flex !important; flex-direction: column; gap: 0; }
+  #week-viewer { display: block !important; overflow: visible; width: auto; }
+  #week-track { display: block; }
+  .week-page { box-shadow: none; page-break-after: always; width: 210mm; height: 297mm; }
   .col-time input { color: #aaa !important; }
   .col-calname { color: #bbb !important; }
   .row.empty-row .col-time input,
@@ -419,7 +434,7 @@ body::after {
   <div id="body-rows"></div>
 </div><!-- /page -->
 
-<div id="week-viewer"></div>
+<div id="week-viewer"><div id="week-track"></div></div>
 
 </div><!-- /center-col -->
 
@@ -519,35 +534,32 @@ async function selectWeek() {
     weekDays.push({ day, events });
   }
 
-  // 全7ページをDOMに構築（印刷用）
-  viewer.innerHTML = '';
+  // 全7ページをレールに構築
+  const track = document.getElementById('week-track');
+  track.innerHTML = '';
   for (let i = 0; i < 7; i++) {
-    const pg = buildWeekPage(weekDays[i].day, weekDays[i].events);
-    pg.dataset.idx = i;
-    viewer.appendChild(pg);
+    track.appendChild(buildWeekPage(weekDays[i].day, weekDays[i].events));
   }
 
   weekPairIdx = 0;
-  updateWeekVisible();
+  updateWeekNav();
 }
 
 function shiftWeekPair(dir) {
   const next = weekPairIdx + dir;
   if (next < 0 || next > 5) return;
   weekPairIdx = next;
-  updateWeekVisible();
+  // 1ページ分スクロール（ページ幅 + gap 20px）
+  const pageW = document.querySelector('.week-page').offsetWidth;
+  document.getElementById('week-viewer').scrollTo({ left: weekPairIdx * (pageW + 20), behavior: 'smooth' });
+  updateWeekNav();
 }
 
-function updateWeekVisible() {
-  document.querySelectorAll('.week-page').forEach((pg, i) => {
-    pg.classList.toggle('wp-visible', i === weekPairIdx || i === weekPairIdx + 1);
-  });
-
+function updateWeekNav() {
   const dayA = weekDays[weekPairIdx].day;
   const dayB = weekDays[Math.min(weekPairIdx + 1, 6)].day;
-  const fmt2 = d => `${d.getMonth()+1}/${d.getDate()}(${DAYS_JP[d.getDay()]})`;
-  document.getElementById('week-nav-label').textContent = `${fmt2(dayA)} — ${fmt2(dayB)}`;
-
+  const f = d => `${d.getMonth()+1}/${d.getDate()}(${DAYS_JP[d.getDay()]})`;
+  document.getElementById('week-nav-label').textContent = `${f(dayA)} — ${f(dayB)}`;
   document.getElementById('week-prev').disabled = (weekPairIdx === 0);
   document.getElementById('week-next').disabled = (weekPairIdx >= 5);
 }
