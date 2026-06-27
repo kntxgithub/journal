@@ -314,12 +314,23 @@ body::before {
 </div>
 
 <script>
-/* ===== 背景画像（Unsplash ランダム）===== */
-(function() {
-  const keywords = ['portrait woman','fashion woman','beautiful woman','elegant woman','model portrait'];
-  const kw = keywords[Math.floor(Math.random() * keywords.length)];
-  const url = `https://source.unsplash.com/1920x1080/?${encodeURIComponent(kw)}&sig=${Date.now()}`;
-  document.body.style.backgroundImage = `url('${url}')`;
+/* ===== 背景画像（Pexels ランダム）===== */
+(async function() {
+  const PEXELS_KEY = 'JK8iPRF0Qq6bMAIicPJ5mpHPokHDWNclw4hvrMzgvTOxbwpLjkxEnW8S';
+  const queries = ['japanese woman portrait','japanese beauty','asian woman fashion','japanese model'];
+  const q = queries[Math.floor(Math.random() * queries.length)];
+  try {
+    const res = await fetch(
+      `https://api.pexels.com/v1/search?query=${encodeURIComponent(q)}&per_page=20&orientation=landscape`,
+      { headers: { Authorization: PEXELS_KEY } }
+    );
+    const data = await res.json();
+    const photos = data.photos || [];
+    if (photos.length) {
+      const photo = photos[Math.floor(Math.random() * photos.length)];
+      document.body.style.backgroundImage = `url('${photo.src.large2x}')`;
+    }
+  } catch(e) { console.warn('背景画像の取得に失敗:', e); }
 })();
 
 /* ===== 日付 ===== */
