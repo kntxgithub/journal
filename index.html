@@ -13,26 +13,24 @@ body {
   font-family: 'Segoe UI', 'Meiryo', sans-serif;
   background: #4a7a8a center center / cover no-repeat fixed;
   display: flex;
-  flex-direction: row;
-  align-items: flex-start;
-  justify-content: center;
+  flex-direction: column;
+  align-items: center;
   padding: 20px;
   min-height: 100vh;
-  gap: 28px;
 }
 
 /* ===== 左：本棚パネル ===== */
 #book-panel {
-  position: sticky;
-  top: 20px;
+  position: fixed;
+  top: 50%;
+  left: 20px;
+  transform: translateY(-50%);
   width: 148px;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 10px;
   z-index: 1;
-  margin-top: 46px;
-  margin-right: 20px;
 }
 #book-cover-wrap {
   width: 148px;
@@ -104,6 +102,7 @@ body {
   align-items: center;
   gap: 10px;
   z-index: 1;
+  position: relative;
 }
 body::after {
   content: '';
@@ -426,7 +425,7 @@ body::after {
 
 <script>
 (async function() {
-  const CACHE_KEY = 'journal_book_v3';
+  const CACHE_KEY = 'journal_book_v4';
   const CACHE_TTL = 24 * 60 * 60 * 1000;
 
   /* 日本語人気書籍フォールバックリスト（Google Books volume ID）*/
