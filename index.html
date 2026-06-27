@@ -152,7 +152,7 @@ body {
 }
 #title-row .title-label {
   font-family: 'Segoe Script', cursive;
-  font-size: 12px;
+  font-size: 20px;
   color: #888;
   white-space: nowrap;
   margin-right: 6px;
@@ -178,7 +178,7 @@ body {
 
 .row {
   display: flex;
-  align-items: center;
+  align-items: flex-end;
   border-bottom: 1px solid #c0ccd8;
   flex: 1;
   min-height: 0;
@@ -193,7 +193,7 @@ body {
 .col-bullet {
   width: 8mm;
   display: flex;
-  align-items: center;
+  align-items: flex-end;
   justify-content: center;
   color: #222;
   font-size: 17px;
@@ -205,10 +205,10 @@ body {
 /* 時間列：左縦線〜右縦線の間 */
 .col-time {
   width: 26mm;
-  padding: 0 3px;
+  padding: 0 3px 1px;
   flex-shrink: 0;
   display: flex;
-  align-items: center;
+  align-items: flex-end;
 }
 .col-time input {
   width: 100%;
@@ -225,8 +225,8 @@ body {
 .col-detail {
   flex: 1;
   display: flex;
-  align-items: center;
-  padding: 0 5px;
+  align-items: flex-end;
+  padding: 0 5px 1px;
   overflow: hidden;
 }
 .col-calname {
@@ -283,12 +283,12 @@ body {
   <div id="header">
     <div id="date-display"></div>
     <div class="hfields">
-      <span class="hf wx"><label>WX:</label><input type="text" placeholder="☀"/></span>
-      <span class="hf"><label>PS:</label><input type="text" placeholder="—"/></span>
-      <span class="hf"><label>MS:</label><input type="text" placeholder="—"/></span>
-      <span class="hf st"><label>ST:</label><input type="text" placeholder="7h30"/></span>
-      <span class="hf"><label>feel:</label><input type="text" placeholder="—"/></span>
-      <span class="hf no"><label>No.</label><input type="text" placeholder="001"/></span>
+      <span class="hf wx"><label>WX:</label><input type="text"/></span>
+      <span class="hf"><label>PS:</label><input type="text"/></span>
+      <span class="hf"><label>MS:</label><input type="text"/></span>
+      <span class="hf st"><label>ST:</label><input type="text"/></span>
+      <span class="hf"><label>feel:</label><input type="text"/></span>
+      <span class="hf no"><label>No.</label><input type="text"/></span>
     </div>
   </div>
   <div id="header-line2"></div>
@@ -296,7 +296,7 @@ body {
   <!-- タイトル行 -->
   <div id="title-row">
     <span class="title-label">Title:</span>
-    <input type="text" placeholder="今日のテーマ"/>
+    <input type="text"/>
   </div>
 
   <!-- 本文行 -->
