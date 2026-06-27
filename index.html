@@ -455,7 +455,7 @@ body::after {
   const q = queries[Math.floor(Math.random() * queries.length)];
   try {
     const res = await fetch(
-      `https://openlibrary.org/search.json?${q}&limit=50&has_fulltext=false&language=eng`
+      `https://openlibrary.org/search.json?q=${encodeURIComponent(q)}&limit=50`
     );
     if (!res.ok) throw new Error(res.status);
     const data = await res.json();
