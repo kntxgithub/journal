@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Daily Bullet Journal</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Segoe UI', 'Meiryo', sans-serif;
+  background: #ddd9ce;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
+  min-height: 100vh;
+}
+
+/* ===== コントロールバー ===== */
+#controls {
+  width: 210mm;
+  max-width: 100%;
+  display: flex;
+  gap: 8px;
+  margin-bottom: 10px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+#controls button {
+  padding: 5px 14px;
+  border: none;
+  border-radius: 3px;
+  cursor: pointer;
+  font-size: 13px;
+  background: #5b7fa6;
+  color: white;
+}
+#controls button:hover { background: #3d5f80; }
+#signin-btn { background: #c0392b !important; }
+#signin-btn:hover { background: #922b21 !important; }
+#user-info { font-size: 11px; color: #666; margin-left: auto; }
+
+/* ===== A4用紙 ===== */
+#page {
+  width: 210mm;
+  height: 297mm;
+  background: #fffff8;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.28);
+  padding: 10mm 10mm 8mm 14mm;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* ===== 縦線 2本：body-rows に限定（タイトル行・ヘッダーに侵入しない）===== */
+#body-rows {
+  position: relative;
+}
+#body-rows::before {
+  content: '';
+  position: absolute;
+  top: 0; bottom: 0;
+  /* bullet幅(8mm) + page左padding(14mm) = 22mm → padding分は親が持つので相対で bullet幅のみ */
+  left: 8mm;
+  width: 1.2px;
+  background: #b03030;
+  opacity: 0.55;
+  pointer-events: none;
+}
+#body-rows::after {
+  content: '';
+  position: absolute;
+  top: 0; bottom: 0;
+  left: 34mm;
+  width: 1px;
+  background: #b03030;
+  opacity: 0.28;
+  pointer-events: none;
+}
+
+/* ===== ヘッダー ===== */
+#header {
+  display: flex;
+  align-items: baseline;
+  gap: 0;
+  padding-bottom: 3px;
+  border-bottom: 2.5px solid #2c2c2c;
+  margin-bottom: 1px;
+}
+/* 二重線 */
+#header-line2 {
+  border-bottom: 1px solid #2c2c2c;
+  margin-bottom: 3px;
+}
+
+#date-display {
+  font-family: 'Segoe Script', 'Brush Script MT', cursive;
+  font-size: 20px;
+  color: #1a1a1a;
+  white-space: nowrap;
+  min-width: 110px;
+  letter-spacing: 0.5px;
+}
+
+.hfields {
+  display: flex;
+  flex: 1;
+  align-items: baseline;
+  gap: 0 10px;
+  padding-left: 10px;
+  flex-wrap: nowrap;
+}
+.hf {
+  display: flex;
+  align-items: baseline;
+  gap: 2px;
+  white-space: nowrap;
+}
+.hf label {
+  font-family: 'Segoe Script', cursive;
+  font-size: 13px;
+  color: #333;
+}
+.hf input {
+  width: 36px;
+  border: none;
+  background: transparent;
+  font-size: 12px;
+  outline: none;
+  padding: 0 2px 1px;
+  color: #111;
+  font-family: 'Segoe Script', cursive;
+}
+.hf.wx input { width: 96px; }
+.hf.st input { width: 42px; }
+.hf.no {
+  margin-left: auto;
+}
+.hf.no label { font-size: 13px; }
+.hf.no input { width: 44px; text-align: right; }
+
+/* ===== タイトル行 ===== */
+#title-row {
+  display: flex;
+  align-items: center;
+  border-bottom: 2px solid #7a9fc0;
+  min-height: 9mm;
+  padding: 2px 0 2px 2px;
+  margin-bottom: 0;
+}
+#title-row .title-label {
+  font-family: 'Segoe Script', cursive;
+  font-size: 12px;
+  color: #888;
+  white-space: nowrap;
+  margin-right: 6px;
+  flex-shrink: 0;
+}
+#title-row input {
+  flex: 1;
+  border: none;
+  background: transparent;
+  font-size: 14px;
+  font-family: 'Segoe Script', cursive;
+  color: #1a3a5c;
+  outline: none;
+}
+
+/* ===== 本文行 ===== */
+#body-rows {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  border-bottom: 2px solid #7a9fc0;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  border-bottom: 1px solid #c0ccd8;
+  flex: 1;
+  min-height: 0;
+  position: relative;
+}
+
+/* 予定あり行の罫線は少し濃く */
+.row.has-event {
+  border-bottom-color: #a0b0c4;
+}
+
+.col-bullet {
+  width: 8mm;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #222;
+  font-size: 17px;
+  line-height: 1;
+  flex-shrink: 0;
+  padding-bottom: 1px;
+}
+
+/* 時間列：左縦線〜右縦線の間 */
+.col-time {
+  width: 26mm;
+  padding: 0 3px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+}
+.col-time input {
+  width: 100%;
+  border: none;
+  background: transparent;
+  font-size: 10.5px;
+  color: #666;
+  outline: none;
+  text-align: center;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+/* 詳細列 */
+.col-detail {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  padding: 0 5px;
+  overflow: hidden;
+}
+.col-calname {
+  font-size: 9.5px;
+  white-space: nowrap;
+  margin-right: 5px;
+  flex-shrink: 0;
+  font-style: italic;
+}
+.col-detail input {
+  flex: 1;
+  border: none;
+  background: transparent;
+  font-size: 12px;
+  color: #111;
+  outline: none;
+  min-width: 0;
+  font-family: 'Segoe UI', 'Meiryo', sans-serif;
+}
+
+/* 空白行は時間・詳細を薄く */
+.row.empty-row .col-time input { color: #ddd; }
+.row.empty-row .col-detail input { color: #ddd; }
+
+
+/* ===== 印刷 ===== */
+@media print {
+  @page { size: A4; margin: 0; }
+  body { background: white; padding: 0; }
+  #controls { display: none !important; }
+  #page { box-shadow: none; }
+  /* 時間・カレンダー名をグレーに（提案2）*/
+  .col-time input { color: #aaa !important; }
+  .col-calname { color: #bbb !important; }
+  /* 空白行は完全に見えなく */
+  .row.empty-row .col-time input,
+  .row.empty-row .col-detail input { color: transparent !important; }
+  input { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+}
+</style>
+</head>
+<body>
+
+<div id="controls">
+  <button id="signin-btn" onclick="handleSignIn()">Googleでサインイン</button>
+  <button onclick="loadCalendar()" id="load-btn" style="display:none">📅 予定を読み込む</button>
+  <button onclick="window.print()">🖨 印刷</button>
+  <span id="user-info"></span>
+</div>
+
+<div id="page">
+
+  <!-- ヘッダー -->
+  <div id="header">
+    <div id="date-display"></div>
+    <div class="hfields">
+      <span class="hf wx"><label>WX:</label><input type="text" placeholder="☀"/></span>
+      <span class="hf"><label>PS:</label><input type="text" placeholder="—"/></span>
+      <span class="hf"><label>MS:</label><input type="text" placeholder="—"/></span>
+      <span class="hf st"><label>ST:</label><input type="text" placeholder="7h30"/></span>
+      <span class="hf"><label>feel:</label><input type="text" placeholder="—"/></span>
+      <span class="hf no"><label>No.</label><input type="text" placeholder="001"/></span>
+    </div>
+  </div>
+  <div id="header-line2"></div>
+
+  <!-- タイトル行 -->
+  <div id="title-row">
+    <span class="title-label">Title:</span>
+    <input type="text" placeholder="今日のテーマ"/>
+  </div>
+
+  <!-- 本文行 -->
+  <div id="body-rows"></div>
+
+
+</div>
+
+<script>
+/* ===== 日付 ===== */
+(function() {
+  const now = new Date();
+  const dayJa = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  const m = now.getMonth() + 1;
+  const d = now.getDate();
+  document.getElementById('date-display').textContent =
+    `${m}/${d}  (${dayJa[now.getDay()]})`;
+})();
+
+/* ===== 行生成 ===== */
+function makeRow(time, calname, detail) {
+  const empty = !time && !detail;
+  const row = document.createElement('div');
+  row.className = 'row' + (empty ? ' empty-row' : ' has-event');
+
+  // bullet
+  const b = document.createElement('div');
+  b.className = 'col-bullet';
+  b.textContent = '•';
+  row.appendChild(b);
+
+  // 時間
+  const ct = document.createElement('div');
+  ct.className = 'col-time';
+  const it = document.createElement('input');
+  it.type = 'text';
+  it.value = time || '';
+  it.placeholder = '';
+  ct.appendChild(it);
+  row.appendChild(ct);
+
+  // 詳細
+  const cd = document.createElement('div');
+  cd.className = 'col-detail';
+  if (calname) {
+    const sp = document.createElement('span');
+    sp.className = 'col-calname';
+    sp.textContent = calname;
+    sp.style.color = calColorMap[calname] || '#888';
+    cd.appendChild(sp);
+  }
+  const id = document.createElement('input');
+  id.type = 'text';
+  id.value = detail || '';
+  cd.appendChild(id);
+  row.appendChild(cd);
+
+  [it, id].forEach(el => el.addEventListener('input', () => {
+    row.classList.remove('empty-row');
+    row.classList.add('has-event');
+  }));
+
+  return row;
+}
+
+/* ===== 初期描画（25行）===== */
+let calColorMap = {};
+
+function render(events = []) {
+  const container = document.getElementById('body-rows');
+  container.innerHTML = '';
+  const total = 25;
+  for (let i = 0; i < total; i++) {
+    const ev = events[i];
+    container.appendChild(ev
+      ? makeRow(ev.timeStr, ev.calname, ev.detail)
+      : makeRow());
+  }
+}
+render();
+
+/* ===== Google OAuth ===== */
+const CLIENT_ID = 'YOUR_CLIENT_ID_HERE.apps.googleusercontent.com';
+const SCOPES = 'https://www.googleapis.com/auth/calendar.readonly';
+let tokenClient, accessToken;
+
+function gapiLoaded() {
+  gapi.load('client', async () => {
+    await gapi.client.init({
+      discoveryDocs: ['https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest'],
+    });
+    tokenClient = google.accounts.oauth2.initTokenClient({
+      client_id: CLIENT_ID,
+      scope: SCOPES,
+      callback: (resp) => {
+        if (resp.error) return;
+        accessToken = resp.access_token;
+        document.getElementById('load-btn').style.display = '';
+        loadCalendar();
+      },
+    });
+  });
+}
+
+function handleSignIn() {
+  if (!tokenClient) { alert('Google APIの読み込み中です。少し待ってから再試行してください。'); return; }
+  tokenClient.requestAccessToken({ prompt: 'consent' });
+}
+
+/* ===== カレンダー取得（並列）===== */
+async function loadCalendar() {
+  if (!accessToken) return;
+  const now = new Date();
+  const start = new Date(now.getFullYear(), now.getMonth(), now.getDate()).toISOString();
+  const end   = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1).toISOString();
+  try {
+    const calList = await gapi.client.calendar.calendarList.list();
+    const cals = calList.result.items || [];
+
+    // 全カレンダーを並列取得
+    const results = await Promise.all(cals.map(cal =>
+      gapi.client.calendar.events.list({
+        calendarId: cal.id, timeMin: start, timeMax: end,
+        singleEvents: true, orderBy: 'startTime',
+      }).then(r => ({ cal, events: r.result.items || [] }))
+    ));
+
+    // カレンダー色マップ
+    calColorMap = {};
+    const googleColors = {
+      '1':'#a4bdfc','2':'#7ae7bf','3':'#dbadff','4':'#ff887c',
+      '5':'#fbd75b','6':'#ffb878','7':'#46d6db','8':'#e1e1e1',
+      '9':'#5484ed','10':'#51b749','11':'#dc2127'
+    };
+    for (const { cal } of results) {
+      calColorMap[cal.summary] = cal.backgroundColor ||
+        (cal.colorId ? googleColors[cal.colorId] : '#888');
+    }
+
+    // 全イベントを時刻順にまとめる
+    const allEvents = [];
+    for (const { cal, events } of results) {
+      for (const ev of events) {
+        const timeStr = ev.start.dateTime
+          ? `${fmt(ev.start.dateTime)}〜${fmt(ev.end.dateTime)}`
+          : '終日';
+        allEvents.push({ timeStr, calname: cal.summary, detail: ev.summary || '', _sort: ev.start.dateTime || ev.start.date });
+      }
+    }
+    allEvents.sort((a, b) => a._sort.localeCompare(b._sort));
+
+    render(allEvents);
+
+    // ユーザー表示
+    try {
+      const me = await gapi.client.request({ path: 'https://www.googleapis.com/oauth2/v3/userinfo' });
+      document.getElementById('user-info').textContent = me.result.email || '';
+    } catch(_) {}
+
+  } catch(e) {
+    alert('読み込みエラー: ' + e.message);
+  }
+}
+
+function fmt(iso) {
+  const d = new Date(iso);
+  return `${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
+}
+</script>
+<script src="https://apis.google.com/js/api.js" onload="gapiLoaded()" async defer></script>
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+</body>
+</html>
