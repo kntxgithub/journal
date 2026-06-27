@@ -423,9 +423,33 @@ body::after {
 
 <script>
 (async function() {
+  const CACHE_KEY = 'journal_book_cache';
+  const CACHE_TTL = 24 * 60 * 60 * 1000; // 24時間
+
+  function showBook(b) {
+    const imgEl = document.getElementById('book-img');
+    imgEl.src = b.imgUrl;
+    imgEl.onerror = () => { document.getElementById('book-panel').style.display='none'; };
+    document.getElementById('book-title').textContent = b.title;
+    document.getElementById('book-author').textContent = b.author;
+    document.getElementById('book-amazon').href =
+      `https://www.amazon.co.jp/s?k=${encodeURIComponent(b.title+' '+b.author)}`;
+    document.getElementById('book-search').href =
+      `https://www.google.com/search?q=${encodeURIComponent(b.title+' '+b.author)}`;
+  }
+
+  /* キャッシュ確認 */
+  try {
+    const cached = JSON.parse(localStorage.getItem(CACHE_KEY) || 'null');
+    if (cached && Date.now() - cached.ts < CACHE_TTL) {
+      showBook(cached); return;
+    }
+  } catch(_) {}
+
+  /* キャッシュなし or 期限切れ → APIリクエスト */
   const queries = [
-    'ベストセラー 2024','話題の本 2024','人気小説 日本','ビジネス書 おすすめ',
-    'self help bestseller 2024','novel bestseller 2024','philosophy bestseller',
+    'ベストセラー 2024','話題の本 日本','人気小説 日本','ビジネス書 おすすめ',
+    'self help bestseller','novel bestseller 2024','philosophy bestseller',
     'psychology bestseller','Japanese literature','史上最高の本',
   ];
   const q = queries[Math.floor(Math.random() * queries.length)];
@@ -433,32 +457,27 @@ body::after {
     const res = await fetch(
       `https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(q)}&maxResults=20&orderBy=relevance&printType=books`
     );
+    if (!res.ok) throw new Error(res.status);
     const data = await res.json();
     const items = (data.items || []).filter(v => v.volumeInfo.imageLinks);
-    if (!items.length) { document.getElementById('book-panel').style.display='none'; return; }
+    if (!items.length) throw new Error('no items');
     const book = items[Math.floor(Math.random() * items.length)];
     const info = book.volumeInfo;
-
-    /* APIが返すthumbnailをそのまま使う（http→httpsのみ変換）*/
     const links = info.imageLinks;
     const imgUrl = (links.large || links.medium || links.thumbnail)
       .replace('http://', 'https://')
       .replace('zoom=1', 'zoom=3');
-    const imgEl = document.getElementById('book-img');
-    imgEl.src = imgUrl;
-    imgEl.onerror = () => { document.getElementById('book-panel').style.display='none'; };
-
-    document.getElementById('book-title').textContent = info.title || '';
-    document.getElementById('book-author').textContent = (info.authors||[]).slice(0,1).join('');
-
-    /* リンク設定 */
-    const title = info.title || '';
-    const author = (info.authors||[]).slice(0,1).join('');
-    const amazonUrl = `https://www.amazon.co.jp/s?k=${encodeURIComponent(title+' '+author)}`;
-    const searchUrl = `https://www.google.com/search?q=${encodeURIComponent(title+' '+author)}`;
-    document.getElementById('book-amazon').href = amazonUrl;
-    document.getElementById('book-search').href = searchUrl;
-  } catch(e) { document.getElementById('book-panel').style.display = 'none'; }
+    const b = {
+      imgUrl,
+      title: info.title || '',
+      author: (info.authors||[]).slice(0,1).join(''),
+      ts: Date.now(),
+    };
+    localStorage.setItem(CACHE_KEY, JSON.stringify(b));
+    showBook(b);
+  } catch(e) {
+    document.getElementById('book-panel').style.display = 'none';
+  }
 })();
 
 (function() {
