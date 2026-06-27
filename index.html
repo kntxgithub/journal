@@ -439,8 +439,11 @@ body::after {
     const book = items[Math.floor(Math.random() * items.length)];
     const info = book.volumeInfo;
 
-    /* volume ID を使った確実なカバー画像URL */
-    const imgUrl = `https://books.google.com/books/content/images/frontcover/${book.id}?fife=w300-h450`;
+    /* APIが返すthumbnailをそのまま使う（http→httpsのみ変換）*/
+    const links = info.imageLinks;
+    const imgUrl = (links.large || links.medium || links.thumbnail)
+      .replace('http://', 'https://')
+      .replace('zoom=1', 'zoom=3');
     const imgEl = document.getElementById('book-img');
     imgEl.src = imgUrl;
     imgEl.onerror = () => { document.getElementById('book-panel').style.display='none'; };
