@@ -284,6 +284,7 @@ body::after {
   outline: none;
   padding: 0 2px 1px 0;
   font-family: 'Segoe UI', 'Meiryo', sans-serif;
+  min-width: 0;
   /* 幅はJSで動的設定 */
 }
 .col-detail input {
@@ -689,6 +690,7 @@ function makeRow(time, calname, detail) {
   ic.type = 'text';
   ic.className = 'col-calname';
   ic.value = calname || '';
+  ic.size = 1; // デフォルトの20文字分幅を無効化
   ic.style.color = calname ? (calColorMap[calname] || '#888') : '#bbb';
   fitCalname(ic);
   cd.appendChild(ic);
