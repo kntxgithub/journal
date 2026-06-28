@@ -277,9 +277,16 @@ body::after {
 .col-calname {
   font-size: 9.5px;
   white-space: nowrap;
-  margin-right: 5px;
+  margin-right: 2px;
   flex-shrink: 0;
   font-style: italic;
+  border: none;
+  background: transparent;
+  outline: none;
+  padding: 0 2px 1px;
+  font-family: 'Segoe UI', 'Meiryo', sans-serif;
+  min-width: 0;
+  max-width: 28mm;
 }
 .col-detail input {
   flex: 1;
@@ -291,8 +298,36 @@ body::after {
   min-width: 0;
   font-family: 'Segoe UI', 'Meiryo', sans-serif;
 }
+/* 行削除ボタン */
+.col-del {
+  width: 0;
+  overflow: visible;
+  position: relative;
+  flex-shrink: 0;
+  align-self: center;
+}
+.col-del button {
+  display: none;
+  position: absolute;
+  right: 2px;
+  top: 50%;
+  transform: translateY(-50%);
+  border: none;
+  background: rgba(180,60,60,0.12);
+  color: #b03030;
+  border-radius: 3px;
+  font-size: 10px;
+  line-height: 1;
+  padding: 1px 4px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.row:hover .col-del button { display: block; }
+.col-del button:hover { background: rgba(180,60,60,0.28); }
+
 .row.empty-row .col-time input { color: #ddd; }
 .row.empty-row .col-detail input { color: #ddd; }
+@media print { .col-del { display: none; } }
 
 /* ===== 週ビュー：スクロールスナップ ===== */
 /* ビューポート：2ページ分の幅でクリップ */
@@ -621,15 +656,17 @@ document.getElementById('date-display').textContent = fmtHeader(currentDate);
 let calColorMap = {};
 
 function makeRow(time, calname, detail) {
-  const empty = !time && !detail;
+  const empty = !time && !calname && !detail;
   const row = document.createElement('div');
   row.className = 'row' + (empty ? ' empty-row' : ' has-event');
 
+  // bullet
   const b = document.createElement('div');
   b.className = 'col-bullet';
   b.textContent = '•';
   row.appendChild(b);
 
+  // 時間
   const ct = document.createElement('div');
   ct.className = 'col-time';
   const it = document.createElement('input');
@@ -638,26 +675,50 @@ function makeRow(time, calname, detail) {
   ct.appendChild(it);
   row.appendChild(ct);
 
+  // カレンダー名（編集可能input）＋予定名
   const cd = document.createElement('div');
   cd.className = 'col-detail';
-  if (calname) {
-    const sp = document.createElement('span');
-    sp.className = 'col-calname';
-    sp.textContent = calname;
-    sp.style.color = calColorMap[calname] || '#888';
-    cd.appendChild(sp);
-  }
+  const ic = document.createElement('input');
+  ic.type = 'text';
+  ic.className = 'col-calname';
+  ic.value = calname || '';
+  ic.style.color = calname ? (calColorMap[calname] || '#888') : 'transparent';
+  ic.style.width = calname ? '' : '0';
+  cd.appendChild(ic);
   const id = document.createElement('input');
   id.type = 'text';
   id.value = detail || '';
   cd.appendChild(id);
   row.appendChild(cd);
 
-  [it, id].forEach(el => el.addEventListener('input', () => {
+  // 削除ボタン
+  const del = document.createElement('div');
+  del.className = 'col-del';
+  const db = document.createElement('button');
+  db.textContent = '✕';
+  db.title = '行を削除';
+  db.addEventListener('click', () => deleteRow(row));
+  del.appendChild(db);
+  row.appendChild(del);
+
+  // 入力で空行クラスを外す
+  [it, ic, id].forEach(el => el.addEventListener('input', () => {
     row.classList.remove('empty-row');
     row.classList.add('has-event');
+    // カレンダー名の幅を動的に調整
+    if (el === ic) {
+      ic.style.width = ic.value ? '' : '0';
+      ic.style.color = ic.value ? (ic.style.color || '#888') : 'transparent';
+    }
   }));
   return row;
+}
+
+function deleteRow(row) {
+  const container = row.closest('#body-rows, .wp-body');
+  if (!container) return;
+  container.removeChild(row);
+  container.appendChild(makeRow()); // 末尾に空白行を追加して25行維持
 }
 
 function render(events = []) {
