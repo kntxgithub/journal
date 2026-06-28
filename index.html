@@ -282,11 +282,11 @@ body::after {
   border: none;
   background: transparent;
   outline: none;
-  padding: 0 0 1px;
-  margin-right: 0;
+  padding: 0 2px 1px 0;
   font-family: 'Segoe UI', 'Meiryo', sans-serif;
-  min-width: 1ch;
-  width: auto;
+  width: 26mm;   /* 縦罫線間と同じ幅 */
+  min-width: 26mm;
+  box-sizing: content-box;
 }
 .col-detail input {
   flex: 1;
@@ -655,6 +655,16 @@ document.getElementById('date-display').textContent = fmtHeader(currentDate);
 /* ===== 行生成 ===== */
 let calColorMap = {};
 
+const _cnCanvas = document.createElement('canvas');
+function fitCalname(el) {
+  const ctx = _cnCanvas.getContext('2d');
+  ctx.font = 'italic 9.5px "Segoe UI", Meiryo, sans-serif';
+  const textPx = ctx.measureText(el.value).width + 4; // +4 for padding
+  const basePx = 26 * 3.7795; // 26mm in px at 96dpi
+  el.style.width = Math.max(basePx, textPx) + 'px';
+  el.style.minWidth = el.style.width;
+}
+
 function makeRow(time, calname, detail) {
   const empty = !time && !calname && !detail;
   const row = document.createElement('div');
@@ -683,7 +693,7 @@ function makeRow(time, calname, detail) {
   ic.className = 'col-calname';
   ic.value = calname || '';
   ic.style.color = calname ? (calColorMap[calname] || '#888') : '#bbb';
-  ic.size = Math.max(1, (calname || '').length || 1);
+  fitCalname(ic);
   cd.appendChild(ic);
   const id = document.createElement('input');
   id.type = 'text';
@@ -706,7 +716,7 @@ function makeRow(time, calname, detail) {
     row.classList.remove('empty-row');
     row.classList.add('has-event');
     if (el === ic) {
-      ic.size = Math.max(1, ic.value.length || 1);
+      fitCalname(ic);
       if (!ic.dataset.colored) ic.style.color = '#777';
     }
   }));
