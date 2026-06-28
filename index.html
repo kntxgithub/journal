@@ -277,16 +277,16 @@ body::after {
 .col-calname {
   font-size: 9.5px;
   white-space: nowrap;
-  margin-right: 2px;
   flex-shrink: 0;
   font-style: italic;
   border: none;
   background: transparent;
   outline: none;
-  padding: 0 2px 1px;
+  padding: 0 0 1px;
+  margin-right: 0;
   font-family: 'Segoe UI', 'Meiryo', sans-serif;
-  min-width: 0;
-  max-width: 28mm;
+  min-width: 1ch;
+  width: auto;
 }
 .col-detail input {
   flex: 1;
@@ -682,8 +682,8 @@ function makeRow(time, calname, detail) {
   ic.type = 'text';
   ic.className = 'col-calname';
   ic.value = calname || '';
-  ic.style.color = calname ? (calColorMap[calname] || '#888') : 'transparent';
-  ic.style.width = calname ? '' : '0';
+  ic.style.color = calname ? (calColorMap[calname] || '#888') : '#bbb';
+  ic.size = Math.max(1, (calname || '').length || 1);
   cd.appendChild(ic);
   const id = document.createElement('input');
   id.type = 'text';
@@ -701,14 +701,13 @@ function makeRow(time, calname, detail) {
   del.appendChild(db);
   row.appendChild(del);
 
-  // 入力で空行クラスを外す
+  // 入力で空行クラスを外す・calname幅を自動調整
   [it, ic, id].forEach(el => el.addEventListener('input', () => {
     row.classList.remove('empty-row');
     row.classList.add('has-event');
-    // カレンダー名の幅を動的に調整
     if (el === ic) {
-      ic.style.width = ic.value ? '' : '0';
-      ic.style.color = ic.value ? (ic.style.color || '#888') : 'transparent';
+      ic.size = Math.max(1, ic.value.length || 1);
+      if (!ic.dataset.colored) ic.style.color = '#777';
     }
   }));
   return row;
